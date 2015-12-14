@@ -86,7 +86,7 @@ def select_optimal_features(feature_matrix,y,classifier):
     cv=StratifiedKFold(y, 5)
     #print("type of cv is: " + str(cv))
     
-    rfecv = RFECV(estimator=classifier, step=1, cv=cv,scoring='f1')
+    rfecv = RFECV(estimator=classifier, step=1, cv=cv,scoring='accuracy')
     print("going to select optimal features")
     rfecv.fit(feature_matrix, y)
     print("done selecting optimal features")
@@ -156,10 +156,11 @@ def sort_and_combine_feature_indices(index_listoflist):
     
     index_num=[]
     index_freq=[]
-    print ("all_indexes after set list is :  " + str(all_indexes))
+   
     for x in unique_index:
         index_num.append(x)
         index_freq.append(all_indexes.count(x))
+    print ("index_num returned after sort n combine is :  " + str(index_num))
     return index_num,index_freq
 def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
                         n_jobs=1, train_sizes=np.linspace(.1, 1.0, 5)):

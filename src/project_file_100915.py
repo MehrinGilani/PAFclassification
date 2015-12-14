@@ -77,11 +77,11 @@ initial_rec_array=ws.dload_rec_names(db_name);
 
 wo_continuation_recs=ws.rmv_continuation_rec(initial_rec_array)
 rec_name_array=ws.rmv_test_rec(wo_continuation_recs)
-
+#rec_name_array=ws.rmv_even_rec(wo_continuation_recs)
 
 
 print str(rec_name_array)
-
+exit()
 #############################################################################
 #### list of features (per record) that we want to extract ######
 # global_mean
@@ -186,7 +186,7 @@ for record in rec_name_array:
     ##### APPLY FILTERS TO CLEAN DATA #######
     
     #RR_sec=dc.detrend_data(dc.quotient_filt(dc.square_filt(RR_sec_unclean)))
-    
+    #RR_sec=dc.detrend_data((RR_sec_unclean)
     
     #RR_sec=dc.quotient_filt(dc.square_filt(RR_sec_unclean))
     RR_sec=RR_sec_unclean
@@ -288,62 +288,12 @@ for record in rec_name_array:
     
     
     
-    ###### Calculating 30 min features for HRV using toolkit VALUES #################
-#     
-#     #SDNN|AVNN|rMSSD|pNN50|TOT PWR|VLF PWR|LF PWR|HF PWR|LF/HF'"
-#     
-#     ######## 30 min time domain features #######
-#     SDANN=pr.get_short_term_hrv("SDANN",rec_name,annotation,start_time,end_time,output_folder)
-#     #print ("SDANN is: " + str(SDANN));
-#     feature_rec.append(SDANN);
-#     global_vocab,index_of_features=cl.fill_global_vocab("SDANN", index_of_features, global_vocab)
-#     
-#     AVNN=pr.get_short_term_hrv("AVNN",rec_name,annotation,start_time,end_time,output_folder)
-#     feature_rec.append(AVNN);
-#     global_vocab,index_of_features=cl.fill_global_vocab("AVNN", index_of_features, global_vocab)
-#     
-#     rMSSD=pr.get_short_term_hrv("rMSSD",rec_name,annotation,start_time,end_time,output_folder)
-#     feature_rec.append(rMSSD);
-#     global_vocab,index_of_features=cl.fill_global_vocab("rMSSD", index_of_features, global_vocab)
-#     
-#     pNN50=pr.get_short_term_hrv("pNN50",rec_name,annotation,start_time,end_time,output_folder)
-#     feature_rec.append(pNN50);
-#     global_vocab,index_of_features=cl.fill_global_vocab("pNN50", index_of_features, global_vocab)
-#     
-#     
-#     ##### 30 min frequency domain features #####################
-#     TOTPWR=pr.get_short_term_hrv("TOT PWR",rec_name,annotation,start_time,end_time,output_folder)
-#     feature_rec.append(TOTPWR);
-#     global_vocab,index_of_features=cl.fill_global_vocab("TOTPWR", index_of_features, global_vocab)
-#     
-#     VLFPWR=pr.get_short_term_hrv("VLF PWR",rec_name,annotation,start_time,end_time,output_folder)
-#     feature_rec.append(VLFPWR);
-#     global_vocab,index_of_features=cl.fill_global_vocab("VLFPWR", index_of_features, global_vocab)
-#     
-#     ULFPWR=pr.get_short_term_hrv("ULF PWR",rec_name,annotation,start_time,end_time,output_folder)
-#     feature_rec.append(ULFPWR);
-#     global_vocab,index_of_features=cl.fill_global_vocab("ULFPWR", index_of_features, global_vocab)
-#     
-#     LFPWR=pr.get_short_term_hrv("LF PWR",rec_name,annotation,start_time,end_time,output_folder)
-#     feature_rec.append(LFPWR);
-#     global_vocab,index_of_features=cl.fill_global_vocab("LFPWR", index_of_features, global_vocab)
-#     
-#     HFPWR=pr.get_short_term_hrv("HF PWR",rec_name,annotation,start_time,end_time,output_folder)
-#     feature_rec.append(HFPWR);
-#     global_vocab,index_of_features=cl.fill_global_vocab("HFPWR", index_of_features, global_vocab)
-#     
-#     
-#     LF_HF=pr.get_short_term_hrv("LF/HF",rec_name,annotation,start_time,end_time,output_folder)
-#     #print ("LF/HF is: " + str(LF_HF));
-#     feature_rec.append(LF_HF);
-#     global_vocab,index_of_features=cl.fill_global_vocab("LF_HF", index_of_features, global_vocab)
-    
     ##### Calculating 30min features for HRV using toolkit VALUES #################
     total_min=30;
     start_time="00:00:00"
     end_time="00:30:00"
-    feature_list_30min="'SDANN|AVNN|rMSSD|pNN50|TOT PWR|VLF PWR|ULF PWR|LF PWR|HF PWR|LF/HF'"
-    list_of_list_of30min_features=pr.get_short_term_hrv(feature_list_30min,rec_name,annotation,start_time,end_time,output_folder)
+    hrv_feature_list_30min="'SDANN|AVNN|rMSSD|pNN50|TOT PWR|VLF PWR|ULF PWR|LF PWR|HF PWR|LF/HF'"
+    list_of_list_of30min_features=pr.get_short_term_hrv(hrv_feature_list_30min,rec_name,annotation,start_time,end_time,output_folder)
     
     for list in list_of_list_of30min_features:
         for feature_tuple in list:
@@ -383,7 +333,21 @@ for record in rec_name_array:
         feature_rec.append(val)
         global_vocab,index_of_features=cl.fill_global_vocab(name, index_of_features, global_vocab)
     
+    #     ##### Calculating 30 min quadrant points ratio features  #################
+    start_time=0
+    end_time=30;
+    feature_list_30min,feature_name=nlm.calc_30min_sodp_measures(rec_name,annotation, start_time,end_time, x_val_sodp,y_val_sodp)
     
+    ##add value to feature array and name to global vocab
+    for val,name in zip(feature_list_30min,feature_name):
+        feature_rec.append(val)
+        #print name
+        #print val
+        global_vocab,index_of_features=cl.fill_global_vocab(name, index_of_features, global_vocab)
+    
+
+
+
 #     plt.figure()
 #     plt.plot(radius_array,ctm_array)
 #     plt.title("ctm_array for " +str(rec_name))
@@ -391,12 +355,11 @@ for record in rec_name_array:
 #     plt.plot(radius_array,dist_array)
 #     plt.title("dist_array for " +str(rec_name))
     
-#     ##### Calculating 5min features fsodp features #################
-#     feature_list_5min,feature_name=nlm.calc_5min_sodp_measures(rec_name,annotation, total_min, radius_array)
-#     ##add value to feature array and name to global vocab
-#     for val,name in zip(feature_list_5min,feature_name):
-#         feature_rec.append(val)
-#         global_vocab,index_of_features=cl.fill_global_vocab(name, index_of_features, global_vocab)
+    ##### Calculating std of 5min features in all 6 intervals in 30min sodp features #################
+    list_of_listall_features_6_intervals,std_dev_all_features,feature_name_overall=nlm.calc_std_5min_sodp_measures(rec_name,annotation,30, radius_array)
+    for val,name in zip(std_dev_all_features,feature_name_overall):
+        feature_rec.append(val)
+        global_vocab,index_of_features=cl.fill_global_vocab(name, index_of_features, global_vocab)
 ############################################################################################################################################################
 
 

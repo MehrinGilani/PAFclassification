@@ -35,6 +35,7 @@ import graphs
 import read_write as rw;
 import non_linear_measures as nlm;
 import classification_functions as cl
+import pandas as pd
 
 
 #for the given db_name
@@ -60,6 +61,18 @@ import classification_functions as cl
 output_folder="/home/ubuntu/Documents/Thesis_work/testing/hrv_5min/"
 
 
+
+
+# def write_df_to_csv(feature_matrix,feature_names,output_folder,file_name):
+#     #this function stores the features with their headers in csv file
+#     feature_df=pd.DataFrame(feature_matrix)
+#     feature_names_df=pd.DataFrame(feature_names)
+#     file_path=output_folder+file_name
+#     print(file_path)
+#     feature_df.to_csv(file_path,header=feature_names_df)
+#     return None
+    
+
 db_name="afpdb";
 initial_rec_array=[];
 rec_name_array=[];
@@ -77,10 +90,12 @@ initial_rec_array=ws.dload_rec_names(db_name);
 
 wo_continuation_recs=ws.rmv_continuation_rec(initial_rec_array)
 rec_name_array=ws.rmv_test_rec(wo_continuation_recs)
+#rec_name_array=ws.rmv_even_rec(wo_continuation_recs)
 
 
 
 print str(rec_name_array)
+np.savetxt(output_folder+"rec_name_list.txt",rec_name_array,fmt="%s",delimiter=',',newline='\n')
 
 #############################################################################
 #### list of features (per record) that we want to extract ######
@@ -313,6 +328,91 @@ for record in rec_name_array:
             global_vocab,index_of_features=cl.fill_global_vocab(feature_tuple[0], index_of_features, global_vocab)
     
     
+    
+    ###### Calculating non-linear features for RR_sec VALUES #################
+    ctm_array=[];
+    dist_array=[];
+    total_min=30;
+    x_val_sodp,y_val_sodp,ctm_array,ctm_feature_name,dist_array,dist_feature_name=nlm.calc_sodp_measures(rec_name,RR_sec, radius_array);
+        
+    ##add value to feature array and name to global vocab
+    for val,name in zip(ctm_array,ctm_feature_name):
+        feature_rec.append(val)
+        global_vocab,index_of_features=cl.fill_global_vocab(name, index_of_features, global_vocab)
+    
+    for val,name in zip(dist_array,dist_feature_name):
+        feature_rec.append(val)
+        global_vocab,index_of_features=cl.fill_global_vocab(name, index_of_features, global_vocab)
+    
+    
+    #nlm.calc_std_5min_sodp_measures(rec_name, annotation, total_min, radius_array)
+
+   
+    #     ##### Calculating 30 min quadrant points ratio features  #################
+    start_time=0
+    end_time=30;
+    feature_list_30min,feature_name=nlm.calc_30min_sodp_measures(rec_name,annotation, start_time,end_time, x_val_sodp,y_val_sodp)
+    
+    ##add value to feature array and name to global vocab
+    for val,name in zip(feature_list_30min,feature_name):
+        feature_rec.append(val)
+        #print name
+        #print val
+        global_vocab,index_of_features=cl.fill_global_vocab(name, index_of_features, global_vocab)
+    
+    
+    ##### Calculating std of 5min features in all 6 intervals in 30min sodp features #################
+    list_of_listall_features_6_intervals,std_dev_all_features,feature_name_overall=nlm.calc_std_5min_sodp_measures(rec_name,annotation,30, radius_array)
+    for val,name in zip(std_dev_all_features,feature_name_overall):
+        feature_rec.append(val)
+        global_vocab,index_of_features=cl.fill_global_vocab(name, index_of_features, global_vocab)
+     
+    
+    
+    
+    ##add value to feature array and name to global vocab
+#     dist_bw_feature=21
+#     start_ind=0
+#     end_ind=105
+#     feature_name_overall=[]
+#     print (len(feature_list_5min))
+#     all_features_6_intervals=[]
+#     for i in range(0,21):
+#         name=str(feature_name[i])
+#         feature_name_overall.append(name[:-2])
+#         print("feature_name is: " + str(name[:-2]))
+#         print ("i is: " + str(i))
+#         feature_index_5min=range(start_ind,end_ind+21,dist_bw_feature)
+#         print ("inital indexes for feature index is: " + str(feature_index_5min))
+#         one_feature_all_intervals=[]
+#         for val in feature_index_5min:
+#             
+#             print("val is : "+str(val))
+#             feature_val=feature_list_5min[val]
+#             print("feature_val at index : " + str(val)+" is: "+str(feature_val))
+#             one_feature_all_intervals.append(feature_val)
+#              
+#         all_features_6_intervals.append(one_feature_all_intervals)    
+#         start_ind=start_ind+1
+#         end_ind=end_ind+1
+#         feature_index_5min=range(start_ind,end_ind+21,dist_bw_feature)
+#         print ("new indexes for feature index is: " + str(feature_index_5min))
+#     
+#     std_dev_all_features=[]
+#     for list_feature_vals in all_features_6_intervals:
+#         std_dev_5min_feature=np.std(list_feature_vals)
+#         std_dev_all_features.append(std_dev_5min_feature)    
+#        
+#     for name,val in zip(feature_name_overall,std_dev_all_features):
+#         print("name of feature is : " + str(name))
+#         print("val of feature is : " + str(val))
+    #print("all feaures list of list is: " +str(all_features_6_intervals))
+    
+    
+    #for val,name in zip(feature_list_5min,feature_name):
+        # we dont need to append these features
+        #feature_rec.append(val)
+        #global_vocab,index_of_features=cl.fill_global_vocab(name, index_of_features, global_vocab)
     
     
     

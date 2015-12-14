@@ -28,7 +28,7 @@ from sklearn import neighbors, datasets
 from sklearn import cross_validation
 from sklearn import metrics
 from sklearn.pipeline import make_pipeline
-from sklearn.metrics import accuracy_score,precision_score,recall_score
+from sklearn.metrics import accuracy_score,precision_score,recall_score,f1_score
 from sklearn.metrics.metrics import confusion_matrix
 from sklearn.metrics import precision_recall_curve
 from sklearn.metrics import auc
@@ -48,6 +48,7 @@ import graphs
 import read_write as rw;
 import non_linear_measures as nlm;
 import classification_functions as cl
+import sklearn
 
 ##############################################################################
 output_folder="/home/ubuntu/Documents/Thesis_work/results/19_oct_results/non_linear/sodp_analysis/no_5min_features/"
@@ -78,14 +79,17 @@ all_feature_matrix=cl.covert_array_to_matrix(all_features,len(all_features),max(
 
 #print all_feature_matrix
 print ("shape of all feature matrix  is: " + str(all_feature_matrix.shape))
-
 #################### SEPARATING EVALUATION DATA #########################
-X_cv_loop, X_eval, y_cv_loop, y_eval = cross_validation.train_test_split(all_feature_matrix, y, test_size=0.2, random_state=0)
+#X_cv, X_eval, y_cv, y_eval = cross_validation.train_test_split(all_feature_matrix, y, test_size=0.2, random_state=0)
+
+exit()
 
 ############## with normalisation ######################
 # Classification
-normalised="  "
-normalized_matrix=cl.normalise_mean_var(all_feature_matrix)
+# normalised="  "
+# normalized_matrix=cl.normalise_mean_var(all_feature_matrix)
+# rw.write_df_to_csv(normalized_matrix, csv_header, output_folder, "features_normalised_test.csv")
+# exit()
 
 
 #print ("type of normalised_matrix is: " + str(type(normalized_matrix)))
@@ -101,7 +105,8 @@ normalized_matrix=cl.normalise_mean_var(all_feature_matrix)
 
 # Run classifier with cross-validation and plot ROC curves
 folds=10
-cv = StratifiedKFold(y_cv_loop, n_folds=folds,shuffle=True)
+cv = StratifiedKFold(y, n_folds=folds,shuffle=True)
+classifier = svm.SVC(kernel='linear', probability=True)
 classifier = svm.SVC(kernel='linear', probability=True)
 
 # mean_tpr = 0.0
@@ -118,13 +123,22 @@ y_proba_report=[]
 
 for i, (train, test) in enumerate(cv):
     ## prepare and normalize test train matrices
-    normalized_matrix_train=cl.normalise_mean_var(X_cv_loop[train])
-    normalised_matrix_test=cl.normalise_mean_var(X_cv_loop[test])
+    
+    print(train)
+    exit()
+    
+    normalized_matrix_train=cl.normalise_mean_var(all_feature_matrix[train])
+    normalised_matrix_test=cl.normalise_mean_var(all_feature_matrix[test])
     
     y_predicted2=[]
     
     #select features using rfecv only on train data
-    only_feature_selection_matrix,index_arr_onlyfs=cl.select_optimal_features(normalized_matrix_train,y_cv_loop[train],classifier)
+    only_feature_selection_matrix,index_arr_onlyfs=cl.select_optimal_features(normalized_matrix_train,y[train],classifier)
+    
+    #index_num,index_freq=cl.sort_and_combine_feature_indices(index_arr_onlyfs)
+    for val in index_arr_onlyfs:
+        #print ("val is: " +str(val))
+        print (inv_global_vocab[val])
     
     
     #index_num_fs_only,index_freq_fs_only=cl.sort_and_combine_feature_indices(index_arr_onlyfs)
@@ -135,13 +149,16 @@ for i, (train, test) in enumerate(cv):
     #classifier.fit(matrix_for_train, y[train]) 
     
     matrix_for_test=cl.make_new_matrix(index_arr_onlyfs,normalised_matrix_test)  
-    probas_ = classifier.fit(matrix_for_train, y_cv_loop[train]).predict_proba(matrix_for_test)
+    probas_ = classifier.fit(matrix_for_train, y[train]).predict_proba(matrix_for_test)
     ##########  ADDING VARIABLES FOR CLASSIFICATION REPORT HERE ####################
+   
+    
     
     y_proba_report.extend(probas_)
     y_predicted2=(classifier.predict(matrix_for_test))     
+    print("f1-score for this set of features is:  "+ str(f1_score(y[test],y_predicted2)))
     y_predicted_report.extend(y_predicted2)
-    y_test_report.extend(y_cv_loop[test])  
+    y_test_report.extend(y[test])  
     
     index_list.append(index_arr_onlyfs)
 
@@ -149,34 +166,35 @@ for i, (train, test) in enumerate(cv):
 #### write to file ######
 
 ######## Accumulating indexes of features selected in each fold #############
-
-index_num,index_freq=cl.sort_and_combine_feature_indices(index_list)
-#print("index numbers are: " + str(index_num))
-#print("index freq are: " + str(index_freq))
-print ("total number of features selected after rfecv in cross validation: " + str(len(index_num)))
-
-####### Saving accmulated feature names in text file #######################
-accumulated_feature_arr=[]
-for val in index_num:
-    #print ("val is: " +str(val))
-    #print (inv_global_vocab[val])
-    accumulated_feature_arr.append(inv_global_vocab[val])
-
-
+# 
+# index_num,index_freq=cl.sort_and_combine_feature_indices(index_list)
+# #print("index numbers are: " + str(index_num))
+# #print("index freq are: " + str(index_freq))
+# print ("total number of features selected after rfecv in cross validation: " + str(len(index_num)))
+# 
+# ####### Saving accmulated feature names in text file #######################
+# accumulated_feature_arr=[]
+# for val in index_num:
+#     #print ("val is: " +str(val))
+#     #print (inv_global_vocab[val])
+#     accumulated_feature_arr.append(inv_global_vocab[val])
+# 
+# 
+# np.savetxt(output_folder+"accumulated_features.txt",accumulated_feature_arr,fmt="%s",delimiter=',',newline='\n')
 
 #this function adds the feature value to the comma separated file
-f=open(output_folder+"exel.txt",'w'); 
-for val in accumulated_feature_arr:
-    f.write(str(val)+" ")
-
-for val in y_proba_report:
-    f.write(str(val)+" ")
-    
-for val in y_predicted_report:
-    f.write(str(val)+" ")
-
-for val in y_test_report:
-    f.write(str(val)+" ")
+# f=open(output_folder+"exel.txt",'w'); 
+# for val in accumulated_feature_arr:
+#     f.write(str(val)+" ")
+# 
+# for val in y_proba_report:
+#     f.write(str(val)+" ")
+#     
+# for val in y_predicted_report:
+#     f.write(str(val)+" ")
+# 
+# for val in y_test_report:
+#     f.write(str(val)+" ")
 
 
 
@@ -194,19 +212,19 @@ cl.print_classification_report(y_test_report, y_predicted_report,['class 0', 'cl
 print "###################################"
 
 ###################################################################3
-#################### fitting the classifier with features selected using rfecv#########################
-cv_eval = StratifiedKFold(y_eval, n_folds=folds)
-
-y_test_report_accumulated=[];
-y_predicted_report_accumulated=[]
-y_predicted_report_accumulated,y_test_report_accumulated=cl.do_cross_validation(classifier,cv_eval,X_eval,y_eval,index_num)
-
-
-####### Compute confusion matrix and classsfication report  #######
-#print("y_predicted after extending is : "+ str(y_predicted2))  
-#print("y_test reportafter extending is : "+ str(y_test_report))  
-cl.print_confusion_matrix(y_test_report_accumulated, y_predicted_report_accumulated,"accumulated")
-cl.print_classification_report(y_test_report_accumulated, y_predicted_report_accumulated,['class 0', 'class 1'])
+# #################### fitting the classifier with features selected using rfecv#########################
+# cv_eval = StratifiedKFold(y_eval, n_folds=folds)
+# 
+# y_test_report_accumulated=[];
+# y_predicted_report_accumulated=[]
+# y_predicted_report_accumulated,y_test_report_accumulated=cl.do_cross_validation(classifier,cv_eval,X_eval,y_eval,index_num)
+# 
+# 
+# ####### Compute confusion matrix and classsfication report  #######
+# #print("y_predicted after extending is : "+ str(y_predicted2))  
+# #print("y_test reportafter extending is : "+ str(y_test_report))  
+# cl.print_confusion_matrix(y_test_report_accumulated, y_predicted_report_accumulated,"accumulated")
+# cl.print_classification_report(y_test_report_accumulated, y_predicted_report_accumulated,['class 0', 'class 1'])
 
 exit()
 

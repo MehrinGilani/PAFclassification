@@ -136,7 +136,7 @@ def get_short_term_hrv(feature_list,rec_name,annotation,start_time,end_time,outp
     print ("start time: " + str(start_time))
     print ("end time: " + str(end_time))
     #feature_list="'SDNN|AVNN|rMSSD|pNN50|TOT PWR|VLF PWR|LF PWR|HF PWR|LF/HF'"
-    all_file=output_folder+"all_30min.txt"
+    all_file=output_folder+"hrv_temp_30min.txt"
     get_hrv_path="/home/ubuntu/mehrin/wfdb/wfdb-10.5.23/HRV"
     os.chdir(get_hrv_path) 
 
