@@ -51,7 +51,8 @@ import classification_functions as cl
 import sklearn
 
 ##############################################################################
-output_folder="/home/ubuntu/Documents/Thesis_work/results/19_oct_results/non_linear/sodp_analysis/no_5min_features/"
+
+output_folder="/home/ubuntu/Documents/Thesis_work/results/19_oct_results/non_linear/sodp_analysis/5min_trend_features/"
 #output_folder="/home/ubuntu/Documents/Thesis_work/results/19_oct_results/afpdb_test_records/"
 
 ### read values from text files ######
@@ -107,10 +108,10 @@ for train_index, test_index in cv_shufflesplit:
     for ind_train in train_index:
         train_recs.append(rec_name_array[ind_train])
     #combine_n_write_df_to_csv(feature_matrix,feature_names,col_to_add,added_col_header,output_folder,file_name)
-    rw.combine_n_write_df_to_csv(all_feature_matrix[train_index], csv_header, y[train_index],["labels"],output_folder, "features_NOT_normalised_learning_Xtrain_ss_testtttt.csv")
-    rw.combine_n_write_df_to_csv(train_index,["training_index"],train_recs,["training_recs"],output_folder,"train_index_testtttt.csv")
-    rw.combine_n_write_df_to_csv(all_feature_matrix[test_index], csv_header,y[test_index],["labels"], output_folder, "features_NOT_normalised_learning_Xtest_ss_testtttt.csv")
-    rw.combine_n_write_df_to_csv(test_index,["testing_index"],test_recs,["testing_recs"],output_folder,"test_index_testtttt.csv")
+    rw.combine_n_write_df_to_csv(all_feature_matrix[train_index], csv_header, y[train_index],["labels"],output_folder, "features_NOT_normalised_learning_Xtrain_5min_trend.csv")
+    rw.combine_n_write_df_to_csv(train_index,["training_index"],train_recs,["training_recs"],output_folder,"train_index_n_recname.csv")
+    rw.combine_n_write_df_to_csv(all_feature_matrix[test_index], csv_header,y[test_index],["labels"], output_folder, "features_NOT_normalised_learning_Xtest_5min_test.csv")
+    rw.combine_n_write_df_to_csv(test_index,["testing_index"],test_recs,["testing_recs"],output_folder,"test_index_n_recname.csv")
 
 exit()
 

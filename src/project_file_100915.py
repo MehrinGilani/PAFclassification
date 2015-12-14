@@ -57,7 +57,7 @@ import classification_functions as cl
 
 
 
-output_folder="/home/ubuntu/Documents/Thesis_work/results/19_oct_results/non_linear/sodp_analysis/no_5min_features/"
+output_folder="/home/ubuntu/Documents/Thesis_work/results/19_oct_results/non_linear/sodp_analysis/5min_trend_features/"
 
 
 db_name="afpdb";
@@ -81,7 +81,7 @@ rec_name_array=ws.rmv_test_rec(wo_continuation_recs)
 
 
 print str(rec_name_array)
-exit()
+
 #############################################################################
 #### list of features (per record) that we want to extract ######
 # global_mean
@@ -264,15 +264,15 @@ for record in rec_name_array:
     
     for val in std_dev_window_arr:
             if val > threshold_1:
-                #number of values greater than 0.2
+                #number of values greater than 0.4
                 count_threshold_1=count_threshold_1+1;
             
-            elif val > threshold_2:
+            if val > threshold_2:
                 #number of values greater than 0.3
                 count_threshold_2=count_threshold_2+1;  
             
-            elif val > threshold_3:
-                #number of values greater than 0.4
+            if val > threshold_3:
+                #number of values greater than 0.2
                 count_threshold_3=count_threshold_3+1;
             
    

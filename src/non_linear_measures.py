@@ -822,10 +822,10 @@ def calc_std_5min_sodp_measures(rec_name,annotation, total_min, radius_array):
         
         RR_sec=RR_sec_unclean
         
-        print("len of 5min RR_sec is: " + str(len(RR_sec)))
+        #print("len of 5min RR_sec is: " + str(len(RR_sec)))
         num_RR_5min=len(RR_sec)
         
-        print("num_RR_5min_"+str(num_5min_interval))
+        #print("num_RR_5min_"+str(num_5min_interval))
         x_val_sodp,y_val_sodp,ctm_array,ctm_feature_name,distance_array,dist_feature_name=calc_sodp_measures(rec_name,RR_sec, radius_array);
         ## calculate the number of poitns in each quadrant
         num_points_on_graph=len(x_val_sodp)
@@ -934,66 +934,66 @@ def calc_std_5min_sodp_measures(rec_name,annotation, total_min, radius_array):
         
         #store the quad ratio values in features list
         feature_list_5min.append(quad1_ratio)
-        feature_name.append("quad1_ratio_5min_"+str(num_5min_interval))
+        feature_name.append("std_quad1_ratio_5min_"+str(num_5min_interval))
         
         feature_list_5min.append(quad2_ratio)
-        feature_name.append("quad2_ratio_5min_"+str(num_5min_interval))
+        feature_name.append("std_quad2_ratio_5min_"+str(num_5min_interval))
     
         feature_list_5min.append(quad3_ratio)
-        feature_name.append("quad3_ratio_5min_"+str(num_5min_interval))
+        feature_name.append("std_quad3_ratio_5min_"+str(num_5min_interval))
         
         feature_list_5min.append(quad4_ratio)
-        feature_name.append("quad4_ratio_5min_"+str(num_5min_interval))
+        feature_name.append("std_quad4_ratio_5min_"+str(num_5min_interval))
         
         
    
         feature_list_5min.append(quad_11_ratio)
-        feature_name.append("quad11_ratio_5min_"+str(num_5min_interval))
+        feature_name.append("std_quad11_ratio_5min_"+str(num_5min_interval))
     
         feature_list_5min.append(quad_12_ratio)
-        feature_name.append("quad12_ratio_5min_"+str(num_5min_interval))
+        feature_name.append("std_quad12_ratio_5min_"+str(num_5min_interval))
         
         feature_list_5min.append(quad_13_ratio)
-        feature_name.append("quad13_ratio_5min_"+str(num_5min_interval))
+        feature_name.append("std_quad13_ratio_5min_"+str(num_5min_interval))
     
         feature_list_5min.append(quad_14_ratio)
-        feature_name.append("quad14_ratio_5min_"+str(num_5min_interval))
+        feature_name.append("std_quad14_ratio_5min_"+str(num_5min_interval))
     
         feature_list_5min.append(quad_21_ratio)
-        feature_name.append("quad21_ratio_5min_"+str(num_5min_interval))
+        feature_name.append("std_quad21_ratio_5min_"+str(num_5min_interval))
     
         feature_list_5min.append(quad_22_ratio)
-        feature_name.append("quad22_ratio_5min_"+str(num_5min_interval))
+        feature_name.append("std_quad22_ratio_5min_"+str(num_5min_interval))
         
         feature_list_5min.append(quad_23_ratio)
-        feature_name.append("quad23_ratio_5min_"+str(num_5min_interval))
+        feature_name.append("std_quad23_ratio_5min_"+str(num_5min_interval))
     
         feature_list_5min.append(quad_24_ratio)
-        feature_name.append("quad24_ratio_5min_"+str(num_5min_interval))
+        feature_name.append("std_quad24_ratio_5min_"+str(num_5min_interval))
         
         feature_list_5min.append(quad_31_ratio)
-        feature_name.append("quad31_ratio_5min_"+str(num_5min_interval))
+        feature_name.append("std_quad31_ratio_5min_"+str(num_5min_interval))
     
         feature_list_5min.append(quad_32_ratio)
-        feature_name.append("quad32_ratio_5min_"+str(num_5min_interval))
+        feature_name.append("std_quad32_ratio_5min_"+str(num_5min_interval))
         
         feature_list_5min.append(quad_33_ratio)
-        feature_name.append("quad33_ratio_5min_"+str(num_5min_interval))
+        feature_name.append("std_quad33_ratio_5min_"+str(num_5min_interval))
     
         feature_list_5min.append(quad_34_ratio)
-        feature_name.append("quad34_ratio_5min_"+str(num_5min_interval))
+        feature_name.append("std_quad34_ratio_5min_"+str(num_5min_interval))
         
         feature_list_5min.append(quad_41_ratio)
-        feature_name.append("quad41_ratio_5min_"+str(num_5min_interval))
+        feature_name.append("std_quad41_ratio_5min_"+str(num_5min_interval))
     
         feature_list_5min.append(quad_42_ratio)
-        feature_name.append("quad42_ratio_5min_"+str(num_5min_interval))
+        feature_name.append("std_quad42_ratio_5min_"+str(num_5min_interval))
         
         feature_list_5min.append(quad_43_ratio)
-        feature_name.append("quad43_ratio_5min_"+str(num_5min_interval))
+        feature_name.append("std_quad43_ratio_5min_"+str(num_5min_interval))
     
         feature_list_5min.append(quad_44_ratio)
-        feature_name.append("quad44_ratio_5min_"+str(num_5min_interval))
+        feature_name.append("std_quad44_ratio_5min_"+str(num_5min_interval))
         
         #print ("feature list for this 5 min interval is: " + str(feature_list_5min))
         #print("indexes are:                              " + str(range(len(feature_list_5min))))
@@ -1009,7 +1009,7 @@ def calc_std_5min_sodp_measures(rec_name,annotation, total_min, radius_array):
     for i in range(0,21):
         name=str(feature_name[i])
         feature_name_overall.append(name[:-2])
-        print("feature_name is: " + str(name[:-2]))
+        #print("feature_name is: " + str(name[:-2]))
         feature_index_5min=range(start_ind,end_ind+21,dist_bw_feature)
         one_feature_all_intervals=[]
         for val in feature_index_5min:

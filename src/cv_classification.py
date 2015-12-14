@@ -51,7 +51,8 @@ import classification_functions as cl
 import sklearn
 
 ##############################################################################
-output_folder="/home/ubuntu/Documents/Thesis_work/results/19_oct_results/non_linear/sodp_analysis/no_5min_features/"
+
+output_folder="/home/ubuntu/Documents/Thesis_work/results/19_oct_results/non_linear/sodp_analysis/5min_trend_features/"
 #output_folder="/home/ubuntu/Documents/Thesis_work/results/19_oct_results/afpdb_test_records/"
 
 ### read values from text files ######
