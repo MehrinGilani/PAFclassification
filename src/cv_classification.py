@@ -76,7 +76,7 @@ print ("label array is: " + str(y))
 
 
 #convert list of lists to matrix
-all_feature_matrix=cl.covert_array_to_matrix(all_features,len(all_features),max(global_vocab.values())+1);
+all_feature_matrix=cl.covert_array_to_matrix(all_features,len(all_features));
 
 #print all_feature_matrix
 print ("shape of all feature matrix  is: " + str(all_feature_matrix.shape))

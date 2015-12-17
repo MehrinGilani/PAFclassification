@@ -54,7 +54,7 @@ db_name="afpdb";
 
 annotation=dload_annotator_names(db_name)[0];
 #rec_name=dload_rec_names(db_name)[0];
-rec_name = "afpdb/p01c"
+rec_name = "afpdb/n04c"
 
 #Find the number of signals in record
 nsig = wfdb.isigopen(rec_name, None, 0);
@@ -178,6 +178,8 @@ print("starting time of record is: " + (wfdb.timstr(0L)));
 #print("aduphys for sig0: " ,physig0);
 #print("aduphys for sig1: " ,physig1);
 
+##Plot graph
+fig = plt.figure()
 
 
 #write signal value to file
@@ -202,20 +204,17 @@ for i in f:
 
 
 #axis labels and legends
-#plt.xlabel("time elapsed from start of record");
-#plt.ylabel(" ecg (mV) ");
-#plt.title(" %s" % rec_name);
+plt.xlabel("time elapsed from start of record");
+plt.ylabel(" ecg (mV) ");
+plt.title(" %s" % rec_name);
 
-
-##Plot graph
-#fig = plt.figure()
-
-##ax.set_xticks(np.arange(0,(num_value/freq),0.2));
+ax = fig.gca();
+ax.set_xticks(np.arange(0,(num_value/freq),0.2));
 #ax.set_yticks(np.arange(sig_min,sig_max,0.5));
 
 #keep grid
-#ax.grid(True);
-#ax.set_xticklabels([])
+ax.grid(True);
+ax.set_xticklabels([])
 
 plt.figure()
 plt.plot(fft_values)

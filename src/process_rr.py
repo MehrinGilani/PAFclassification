@@ -71,6 +71,12 @@ def get_RR_interval(rec_name,annotation,start_time,end_time):
                 beats=beats+1;
                 rr_sec=rr_int/freq
                 rr_sec_rounded=round(rr_sec,3);
+                
+                ###############testing here############################
+         
+                
+                ############################################
+                
                 RR_sec_func.append(rr_sec_rounded);
                 # sampling intervals (e.g., if the original recording was sampled at 128 samples per second, then an 
                 t = annot.time

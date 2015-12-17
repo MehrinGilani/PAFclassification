@@ -237,8 +237,8 @@ def count_points_in_16quad(x_val,y_val,quad):
             sub_quad=34
      
     elif quad is 4:
-        #if x_val>=0.5 and x_val<=1 and y_val>= -0.5 and y_val<=0:
-        if x_val>=0.5 and y_val>= -0.5 and y_val<=0:
+        if x_val>=0.5 and x_val<=1 and y_val>= -0.5 and y_val<=0:
+        #if x_val>=0.5 and y_val>= -0.5 and y_val<=0:
             sub_quad=41
         elif x_val>=0 and x_val<=0.5 and y_val>= -0.5 and y_val<=0:
             sub_quad=42

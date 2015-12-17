@@ -31,6 +31,8 @@ import wfdb_setup as ws;
 from sklearn.learning_curve import learning_curve
 from sklearn import cross_validation
 from sklearn.svm import SVC
+import read_write as rw;
+
 
 def fill_global_vocab(feature_name,index_of_features,feature_dictionary):
     if feature_name not in feature_dictionary.keys():
@@ -40,19 +42,30 @@ def fill_global_vocab(feature_name,index_of_features,feature_dictionary):
         
 
 
-def generate_labels(rec_array):
+def generate_labels(db_name,rec_array):
     label_array=[]
-    for val in rec_array:
-        if "n" in val:
-            label_array.append(0)
-        elif "p" in val:
-            label_array.append(1)
+    if db_name == "afpdb":
+        for val in rec_array:
+            if "n" in val:
+                label_array.append("normal")
+            elif "p" in val:
+                label_array.append("patient")
+    
+    if db_name =="nsrdb":
+        for val in rec_array:
+            label_array.append("normal")
+    
+    if db_name =="afdb":
+        for val in rec_array:
+            label_array.append("patient")
+    
     print("done writing labels")
+    
     return label_array
 
         
         
-def covert_array_to_matrix(array,num_row,num_col):
+def covert_array_to_matrix(array):
     converted_matrix=np.matrix(array)
     return converted_matrix
 
@@ -64,6 +77,11 @@ def normalise_mean_var(feature_matrix):
     normalized_matrix=preprocessing.scale(feature_matrix,axis=0)
     return normalized_matrix
 
+def get_features_from_folder(output_folder):
+    ### read values from text files ######
+    all_features=rw.read_features_frm_file(output_folder,"all_features_pickle.txt")
+    rec_name_array=rw.read_features_frm_file(output_folder,"rec_name_array_pickle.txt")
+    return all_features,rec_name_array
 
 def train_classifier(feature_list,label_array,cross_validation_type):
 # train a simple svm main or linear cflassifier

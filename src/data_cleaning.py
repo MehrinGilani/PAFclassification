@@ -55,7 +55,8 @@ def square_filt(unclean_array2):
     clean_array2=[];
     index2=[];
     for i in range(0,len(unclean_array2)):
-        if(unclean_array2[i] <0.3 or unclean_array2[i] >2):
+        #if(unclean_array2[i] <0.3 or unclean_array2[i] >5):
+        if(unclean_array2[i] >5):
             index2.append(i); #if above condition is true, append n value to index
     clean_array2=list(unclean_array2);
     ##remove the uncleaned values

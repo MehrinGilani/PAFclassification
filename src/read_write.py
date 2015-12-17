@@ -55,10 +55,10 @@ def combine_n_write_df_to_csv(feature_matrix,feature_names,col_to_add,added_col_
     #feature_df.loc[:,added_col_header]=pd.Series(col_to_add,index=feature_df.index)
     feature_df.loc[:,added_col_header[0]]=pd.Series(col_to_add)
     file_path=output_folder+file_name
-    print(feature_names)
-    print(added_col_header)
+    #print(feature_names)
+    #print(added_col_header)
     all_headers=list(feature_names)+list(added_col_header)
-    print all_headers
+    #print all_headers
     feature_df.to_csv(file_path,header=all_headers,index=False)
     return None
  
@@ -68,4 +68,7 @@ def write_df_to_csv(feature_matrix,feature_names,output_folder,file_name):
     file_path=output_folder+file_name
     feature_df.to_csv(file_path,header=feature_names,index=False)
     return None   
+
+
+
     

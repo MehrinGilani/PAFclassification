@@ -57,29 +57,32 @@ import classification_functions as cl
 
 
 
-output_folder="/home/ubuntu/Documents/Thesis_work/results/19_oct_results/non_linear/sodp_analysis/5min_trend_features/"
+output_folder="/home/ubuntu/Documents/Thesis_work/results/19_oct_results/non_linear/sodp_analysis/afpdb_apdb_nsrdb/afdb/"
 
-
-db_name="afpdb";
+db_name="afdb";
 initial_rec_array=[];
 rec_name_array=[];
 annotator_array=[];
 wo_continuation_recs=[]
-
+ 
 recs_to_remove=['n24','n27','n28'];
-
+ 
 annotator_array=ws.dload_annotator_names(db_name);
-annotation=annotator_array[0];
-print("annotators for this database are: " + str(annotator_array) + " we are choosing " + str(annotator_array[0]))
-
+for ann_name in annotator_array:
+    print ann_name
+    if ann_name == "qrs":
+        annotation=ann_name;
+    if ann_name == "atr":
+        annotation=ann_name;
+print("annotators for this database are: " + str(annotator_array) + " we are choosing " + str(annotation))
 initial_rec_array=ws.dload_rec_names(db_name);
-
-
+ 
+ 
 wo_continuation_recs=ws.rmv_continuation_rec(initial_rec_array)
 rec_name_array=ws.rmv_test_rec(wo_continuation_recs)
 #rec_name_array=ws.rmv_even_rec(wo_continuation_recs)
-
-
+ 
+ 
 print str(rec_name_array)
 
 #############################################################################
@@ -140,7 +143,7 @@ print str(rec_name_array)
 
 
 #radius_array=[0.02,0.04,0.06,0.08,0.10,0.12,0.14,0.16,0.18,0.20,0.22,0.24,0.26,0.28,0.30,0.32,0.34,0.36,0.38, 0.40];
-radius_array=[x / 1000.0 for x in range(0, 1000, 20)]
+radius_array=[x / 1000.0 for x in range(0, 1020, 20)]
 all_features=[]
 ctm_list_list=[]
 dist_list_list=[]
@@ -188,8 +191,10 @@ for record in rec_name_array:
     #RR_sec=dc.detrend_data(dc.quotient_filt(dc.square_filt(RR_sec_unclean)))
     #RR_sec=dc.detrend_data((RR_sec_unclean)
     
+
     #RR_sec=dc.quotient_filt(dc.square_filt(RR_sec_unclean))
-    RR_sec=RR_sec_unclean
+    RR_sec=dc.square_filt(RR_sec_unclean)
+    #RR_sec=RR_sec_unclean
     ##### Extract delta RR intervals here #######
     delta_RR_sec = pr.get_delta_rr(RR_sec);
     
@@ -242,7 +247,13 @@ for record in rec_name_array:
 #         feature_rec.append(val)
 #         global_vocab,index_of_features=cl.fill_global_vocab("std_window_"+str(window_number), index_of_features, global_vocab)
 #         window_number=window_number+1;
-    
+
+###plot window std_dev and save fig ####
+#     fig_std_p,plot_std_p=graphs.plot_simple(rec_name,range(len(std_dev_window_arr)), std_dev_window_arr, "window std dev for  window size:  %s" % window_size, "std_dev", "window std dev", "r", 0, 0,-0.1, 0.5)
+#     fig_std_p.savefig(output_folder+"std_dev_window_"+record+".png")
+             
+             
+
     ### calculating variation in the std_dev_window_arr and save as feature
     var_std_dev_window_arr=np.std(std_dev_window_arr);
    # print("type of np.std elemnt is : " + str(type(var_std_dev_window_arr()))
@@ -255,12 +266,14 @@ for record in rec_name_array:
 
     ### calculating number of times std_dev_array pass a value
     #if value is greater than 0.4 add 1 to count, if not then check the next statment
+    threshold_4=0.15;
     threshold_3=0.2;
     threshold_2=0.3;
     threshold_1=0.4;
     count_threshold_1=0;
     count_threshold_2=0;
     count_threshold_3=0;
+    count_threshold_4=0;
     
     for val in std_dev_window_arr:
             if val > threshold_1:
@@ -275,7 +288,12 @@ for record in rec_name_array:
                 #number of values greater than 0.2
                 count_threshold_3=count_threshold_3+1;
             
-   
+            if val > threshold_4:
+                #number of values greater than 0.15
+                count_threshold_3=count_threshold_4+1;
+    
+    feature_rec.append(count_threshold_4);
+    global_vocab,index_of_features=cl.fill_global_vocab("count_threshold_"+str(threshold_4), index_of_features, global_vocab)
     
     feature_rec.append(count_threshold_3);
     global_vocab,index_of_features=cl.fill_global_vocab("count_threshold_"+str(threshold_3), index_of_features, global_vocab)
