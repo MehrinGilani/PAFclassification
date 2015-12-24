@@ -54,38 +54,43 @@ import sklearn
 
 ##############################################################################
 #folder to save csv in 
-output_folder="/home/ubuntu/Documents/Thesis_work/results/19_oct_results/non_linear/sodp_analysis/afpdb_apdb_nsrdb/"
+output_folder="/home/ubuntu/Documents/Thesis_work/results/19_oct_results/non_linear/sodp_analysis/square_filtered_features/"
 
-#folder to read feartures from
-output_folder_afpdb="/home/ubuntu/Documents/Thesis_work/results/19_oct_results/non_linear/sodp_analysis/afpdb_apdb_nsrdb/afpdb/"
-output_folder_nsrdb="/home/ubuntu/Documents/Thesis_work/results/19_oct_results/non_linear/sodp_analysis/afpdb_apdb_nsrdb/nsrdb/"
-output_folder_afdb="/home/ubuntu/Documents/Thesis_work/results/19_oct_results/non_linear/sodp_analysis/afpdb_apdb_nsrdb/afdb/"
+
+# #folder to read feartures from
+# output_folder_afpdb="/home/ubuntu/Documents/Thesis_work/results/19_oct_results/non_linear/sodp_analysis/afpdb_apdb_nsrdb/afpdb/"
+# output_folder_nsrdb="/home/ubuntu/Documents/Thesis_work/results/19_oct_results/non_linear/sodp_analysis/afpdb_apdb_nsrdb/nsrdb/"
+# output_folder_afdb="/home/ubuntu/Documents/Thesis_work/results/19_oct_results/non_linear/sodp_analysis/afpdb_apdb_nsrdb/afdb/"
 
 ### read values from text files ######
 
 ## read these once
-global_vocab=rw.read_features_frm_file(output_folder_afpdb,"global_vocab_pickle.txt")
+#global_vocab=rw.read_features_frm_file(output_folder_afpdb,"global_vocab_pickle.txt")
+global_vocab=rw.read_features_frm_file(output_folder,"global_vocab_pickle.txt")
 
 
 ## read features from different databases
+# 
+# all_features_afpdb=rw.read_features_frm_file(output_folder_afpdb,"all_features_pickle.txt")
+# all_features_nsrdb=rw.read_features_frm_file(output_folder_nsrdb,"all_features_pickle.txt")
+# all_features_afdb=rw.read_features_frm_file(output_folder_afdb,"all_features_pickle.txt")
+all_features=rw.read_features_frm_file(output_folder,"all_features_pickle.txt")
 
-all_features_afpdb=rw.read_features_frm_file(output_folder_afpdb,"all_features_pickle.txt")
-all_features_nsrdb=rw.read_features_frm_file(output_folder_nsrdb,"all_features_pickle.txt")
-all_features_afdb=rw.read_features_frm_file(output_folder_afdb,"all_features_pickle.txt")
-
-## read rec_name_array
-rec_name_array_afpdb=rw.read_features_frm_file(output_folder_afpdb,"rec_name_array_pickle.txt")
-rec_name_array_nsrdb=rw.read_features_frm_file(output_folder_nsrdb,"rec_name_array_pickle.txt")
-rec_name_array_afdb=rw.read_features_frm_file(output_folder_afdb,"rec_name_array_pickle.txt")
-
-all_rec_name_array=rec_name_array_afpdb+rec_name_array_nsrdb+ rec_name_array_afdb
+# ## read rec_name_array
+# rec_name_array_afpdb=rw.read_features_frm_file(output_folder_afpdb,"rec_name_array_pickle.txt")
+# rec_name_array_nsrdb=rw.read_features_frm_file(output_folder_nsrdb,"rec_name_array_pickle.txt")
+# rec_name_array_afdb=rw.read_features_frm_file(output_folder_afdb,"rec_name_array_pickle.txt")
+rec_name_array=rw.read_features_frm_file(output_folder,"rec_name_array_pickle.txt")
+#all_rec_name_array=rec_name_array_afpdb+rec_name_array_nsrdb+ rec_name_array_afdb
+all_rec_name_array=rec_name_array
 print ("all rec_name array is: " + str(all_rec_name_array))
 #generate class labels
-y_afpdb=cl.generate_labels("afpdb",rec_name_array_afpdb)
-y_nsrdb=cl.generate_labels("nsrdb",rec_name_array_nsrdb)
-y_afdb=cl.generate_labels("afdb",rec_name_array_afdb)
+# y_afpdb=cl.generate_labels("afpdb",rec_name_array_afpdb)
+# y_nsrdb=cl.generate_labels("nsrdb",rec_name_array_nsrdb)
+# y_afdb=cl.generate_labels("afdb",rec_name_array_afdb)
 
-y_all=np.array(y_afpdb+y_nsrdb+y_afdb)
+#y_all=np.array(y_afpdb+y_nsrdb+y_afdb)
+y_all=cl.generate_labels("afpdb", rec_name_array)
 print ("all label array is: " + str(y_all))
 
 ##################### change key value pairs of global vocab ####################
@@ -96,7 +101,8 @@ np.savetxt(output_folder+"all_features_list.txt",all_features_list,fmt="%s",deli
 
 
 #combine lists and convert list of lists to one big matrix
-all_feature_matrix=cl.covert_array_to_matrix(all_features_afpdb+all_features_nsrdb+all_features_afdb);
+all_feature_matrix=cl.covert_array_to_matrix(all_features);
+#all_feature_matrix=cl.covert_array_to_matrix(all_features_afpdb+all_features_nsrdb+all_features_afdb);
 
 normalized_matrix=cl.normalise_mean_var(all_feature_matrix)
 #print all_feature_matrix
@@ -114,6 +120,10 @@ csv_header=[]
 for val in csv_indexes:
     f_name=inv_global_vocab[val]
     csv_header.append(f_name)
+
+rw.combine_n_write_df_to_csv(all_feature_matrix, csv_header, y_all,["labels"],output_folder, "SQ_filtered_Xtrain.csv")
+#rw.combine_n_write_df_to_csv(train_index,["training_index"],train_recs,["training_recs"],output_folder,"t_rec_train_index_n_recname.csv")
+exit();
 
 # rw.combine_n_write_df_to_csv(all_feature_matrix, csv_header, y,["labels"],output_folder, "features_NOT_normalised_afib_patient.csv")
 # 
@@ -134,8 +144,8 @@ for train_index, test_index in cv_shufflesplit:
     for ind_train in train_index:
         train_recs.append(all_rec_name_array[ind_train])
     #combine_n_write_df_to_csv(feature_matrix,feature_names,col_to_add,added_col_header,output_folder,file_name)
-    rw.combine_n_write_df_to_csv(all_feature_matrix[train_index], csv_header, y_all[train_index],["labels"],output_folder, "RR_features_3dbs_Xtrain.csv")
-    rw.combine_n_write_df_to_csv(train_index,["training_index"],train_recs,["training_recs"],output_folder,"RR_train_index_n_recname.csv")
+    rw.combine_n_write_df_to_csv(all_feature_matrix[train_index], csv_header, y_all[train_index],["labels"],output_folder, "trec_features_3dbs_Xtrain.csv")
+    rw.combine_n_write_df_to_csv(train_index,["training_index"],train_recs,["training_recs"],output_folder,"t_rec_train_index_n_recname.csv")
     rw.combine_n_write_df_to_csv(all_feature_matrix[test_index], csv_header,y_all[test_index],["labels"], output_folder, "RR_features_3dbs_Xtest.csv")
     rw.combine_n_write_df_to_csv(test_index,["testing_index"],test_recs,["testing_recs"],output_folder,"RR_test_index_n_recname.csv")
 

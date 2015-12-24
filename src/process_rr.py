@@ -33,7 +33,7 @@ def get_RR_interval(rec_name,annotation,start_time,end_time):
     sig_time=[];
     
     #change annotations
-    nsamp, freq, annot, init_time = ws.setupWfdb(rec_name,annotation);
+    nsamp, freq, annot, init_time,sdata = ws.setupWfdb(rec_name,annotation);
     RR_sec_func=[];
     #num_sample_end=38400; # this translates to 230339 annot time which means 30 mins of data ## check this
     num_sample_start=start_time*60*freq

@@ -57,9 +57,9 @@ import classification_functions as cl
 
 
 
-output_folder="/home/ubuntu/Documents/Thesis_work/results/19_oct_results/non_linear/sodp_analysis/afpdb_apdb_nsrdb/afdb/"
+output_folder="/home/ubuntu/Documents/Thesis_work/results/19_oct_results/non_linear/sodp_analysis/afpdb_test/"
 
-db_name="afdb";
+db_name="afpdb";
 initial_rec_array=[];
 rec_name_array=[];
 annotator_array=[];
@@ -79,8 +79,8 @@ initial_rec_array=ws.dload_rec_names(db_name);
  
  
 wo_continuation_recs=ws.rmv_continuation_rec(initial_rec_array)
-rec_name_array=ws.rmv_test_rec(wo_continuation_recs)
-#rec_name_array=ws.rmv_even_rec(wo_continuation_recs)
+#rec_name_array=ws.rmv_test_rec(wo_continuation_recs)
+rec_name_array=ws.rmv_even_rec(wo_continuation_recs)
  
  
 print str(rec_name_array)

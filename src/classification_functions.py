@@ -50,6 +50,8 @@ def generate_labels(db_name,rec_array):
                 label_array.append("normal")
             elif "p" in val:
                 label_array.append("patient")
+            elif "t" in val:
+                label_array.append("?")
     
     if db_name =="nsrdb":
         for val in rec_array:

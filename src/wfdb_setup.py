@@ -170,6 +170,7 @@ def setupWfdb(rec_name, annotator ):
     #read name and status of annotation file
     #a.name="atr";
     #a.name="ecg";
+    #a.name="output_annotator"
     a.name=annotator;
     a.stat = wfdb.WFDB_READ;
     
@@ -192,4 +193,4 @@ def setupWfdb(rec_name, annotator ):
         print("cannot open aanopen");
         exit();
     
-    return (nsamp, freq, annot, init_time);
+    return (nsamp, freq, annot, init_time,sdata);
