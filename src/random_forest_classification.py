@@ -138,7 +138,7 @@ for i, (train, test) in enumerate(cv):
      
     rr_pred_normal_index=[]
     rr_pred_patient_index=[]
-    y_predicted=[0]*(len(y_arr[test]))
+    y_predicted=[-1]*(len(y_arr[test]))
      
     
     y_predicted_pwave=[]
@@ -148,53 +148,72 @@ for i, (train, test) in enumerate(cv):
     feature_rr=feature_matrix[:,2:-1]
     
     local_index=[]
-     
-    classifier_1.fit(feature_pwave[train], y_arr[train]) 
-    y_predicted_pwave=(classifier_1.predict(feature_pwave[test]))
-    #y_predicted_pwave=[0]*(len(y_arr[test]))
+    local_patient_index=[]
+    local_normal_index=[]
+    
+    classifier_1.fit(feature_rr[train], y_arr[train]) 
+    y_predicted_rr=(classifier_1.predict(feature_rr[test]))
+    #y_predicted_rr=[1]*(len(y_arr[test]))
     
     
     
-    for i in range(len(y_predicted_pwave)):   
+    for i in range(len(y_predicted_rr)):   
     #for predicted_class in y_predicted_pwave:
-        if y_predicted_pwave[i] == 0:
-            pwave_pred_normal_index.append(test[i])
-        elif y_predicted_pwave[i]== 1:
-            pwave_pred_patient_index.append(test[i])
+        if y_predicted_rr[i] == 0:
             local_index.append(i)
+            rr_pred_normal_index.append(test[i])
+        elif y_predicted_rr[i]== 1:
+            rr_pred_patient_index.append(test[i])
+            local_patient_index.append(i)
+            
             
      
-    classifier_2.fit(feature_rr[train],y_arr[train])
+        
+    classifier_2.fit(feature_pwave[train],y_arr[train])
     
-    rr_y_test=feature_rr[pwave_pred_normal_index]
+    pwave_y_test=feature_pwave[rr_pred_patient_index]
     #print ("rr_y_test is:  " + str(rr_y_test))
-    y_predicted_rr=classifier_2.predict(rr_y_test)
+    y_predicted_pwave=classifier_2.predict(pwave_y_test)
      
     
-    for i in range(len(y_predicted_rr)):
-        if y_predicted_rr[i] == 0:
-            rr_pred_normal_index.append(i)
-        elif y_predicted_rr[i] ==1:
-            rr_pred_patient_index.append(i)
+    for i in range(len(y_predicted_pwave)):
+        if y_predicted_pwave[i] == 0:
+            pwave_pred_normal_index.append(local_patient_index[i])
+        elif y_predicted_pwave[i] ==1:
+            pwave_pred_patient_index.append(local_patient_index[i])
              
     
-    for val in local_index:
-        y_predicted[val]=1;
+   
     
 #     for val in rr_pred_normal_index:
 #         if y_predicted_pwave[val] == y_predicted_rr[val]:
 #             y_predicted[val]=0;
 #         else:
 #             y_predicted[val]=1
-    for val in rr_pred_normal_index:
-            y_predicted[val]=0;
+    for val in local_index:
+        if y_predicted[val] != -1:
+            print("error in local _index loop")
+            #exit()
+        
+        y_predicted[val]=0;
+    
+    for val in pwave_pred_normal_index:
+        if y_predicted[val] != -1:
+            print("error in pwave_pred_normal loop")
+            #exit()
+        y_predicted[val]=0;
    
-    for val in rr_pred_patient_index:
+    for val in pwave_pred_patient_index:
+        if y_predicted[val] != -1:
+            print('val is : ' + str(val))
+            print('y predicted[val] is : ' + str(y_predicted[val]))
+            print("error in pwave_pred_patient loop")
+            #exit()
         #if y_predicted_pwave[val] != y_predicted_rr[val]:
         y_predicted[val]=1;
         
     
-    #y_predicted=y_predicted_pwave
+    #y_predicted=y_predicted_rr
     
     
     ##make predicted array
