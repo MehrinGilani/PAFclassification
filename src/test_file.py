@@ -36,7 +36,8 @@ import classification_functions as cl
 import process_ecg as pecg
 
 
-output_folder="/home/ubuntu/Documents/Thesis_work/testing/pwave_test/"
+output_folder="/home/ubuntu/Documents/Thesis_work/testing/"
+
 
 db_name="afpdb";
 initial_rec_array=[];
@@ -56,7 +57,7 @@ for ann_name in annotator_array:
 print("annotators for this database are: " + str(annotator_array) + " we are choosing " + str(annotation))
 
 ### manually assigning annotation value
-annotation="qrs"
+#annotation="qrs"
 initial_rec_array=ws.dload_rec_names(db_name);
  
  
@@ -108,7 +109,7 @@ for record in rec_name_array:
     
     #ecgpuwave -r afpdb/p02 -a output_annotator -f 00:25:00 -t 00:30:00
     os.system("rm -f "+rdann_file)
-    cmd_create_ann="ecgpuwave -r "+rec_name +" "+"-a"+" "+output_ann+ " -f "+start_time+" -t "+ end_time +" -i 'qrs' "
+    cmd_create_ann="ecgpuwave -r "+rec_name +" "+"-a"+" "+output_ann+ " -f "+start_time+" -t "+ end_time +" -i "+annotation
     print(cmd_create_ann)
     os.system(cmd_create_ann)
     
@@ -117,30 +118,7 @@ for record in rec_name_array:
     #push output text to a file 
     print (cmd_disp_ann)
     os.system(cmd_disp_ann +">" +rdann_file)
-#         
-#         
-#         #use rdann to ouput annotations as a text file
-#         cmd_disp_ann="rdann -r "+rec_name+" -a output_annot"
 
-#     while time_interval < 31:
-#         cmd_create_ann="ecgpuwave -r "+rec_name +" "+"-a"+" "+output_ann+ " -f "+start_time+" -t "+ end_time +"-i 'qrs' "
-#         print(cmd_create_ann)
-#         os.system(cmd_create_ann)
-#         
-#         
-#         #use rdann to ouput annotations as a text file
-#         cmd_disp_ann="rdann -r "+rec_name+" -a output_annot"
-#         #push output text to a file 
-#         print (cmd_disp_ann)
-#         os.system(cmd_disp_ann +">> " +rdann_file)
-#         
-#         time_interval=time_interval+5;
-#         new_end_time="00:"+str(time_interval)+":00"
-#         #print "new end time is : " + new_end_time
-#         start_time=end_time;
-#         end_time=new_end_time; 
-    
-    
     p_wave_times=[] # this will contain p wave values for 1 rec and will be emptied everytime
     
     ## code for p wave goes here ####
@@ -177,11 +155,11 @@ for arr in pwave_time_patient:
     max_pwave_rec=np.max(arr)
     min_pwave_rec=np.min(arr)
     var_pwave_rec=np.var(arr)
-    
+     
     max_vals_patient.append(max_pwave_rec)
     min_vals_patient.append(min_pwave_rec)
     var_vals_patient.append(var_pwave_rec)
-
+ 
 for max_val,min_val in zip(max_vals_patient,min_vals_patient):
     dispersion_vals_patient.append(max_val-min_val)
 
@@ -190,11 +168,11 @@ for arr in pwave_time_normal:
     max_pwave_rec=np.max(arr)
     min_pwave_rec=np.min(arr)
     var_pwave_rec=np.var(arr)
-    
+     
     max_vals_normal.append(max_pwave_rec)
     min_vals_normal.append(min_pwave_rec)
     var_vals_normal.append(var_pwave_rec)
-
+ 
 for max_val,min_val in zip(max_vals_normal,min_vals_normal):
     dispersion_vals_normal.append(max_val-min_val)
 
@@ -212,25 +190,25 @@ mean_pvar_normal=np.mean(var_vals_normal)
 
 #########3 save to csv #############3
 
-np.savetxt(output_folder+"max_vals_patient",max_vals_patient,fmt="%s",delimiter=',',newline='\n')
-np.savetxt(output_folder+"max_vals_normal",max_vals_normal,fmt="%s",delimiter=',',newline='\n')
+np.savetxt(output_folder+"max_vals_patient.csv",max_vals_patient,fmt="%s",delimiter=',',newline='\n')
+np.savetxt(output_folder+"max_vals_normal.csv",max_vals_normal,fmt="%s",delimiter=',',newline='\n')
 
 np.savetxt(output_folder+"dispersion_vals_patient",dispersion_vals_patient,fmt="%s",delimiter=',',newline='\n')
 np.savetxt(output_folder+"dispersion_vals_normal",dispersion_vals_normal,fmt="%s",delimiter=',',newline='\n')
 
 np.savetxt(output_folder+"var_vals_patient",var_vals_patient,fmt="%s",delimiter=',',newline='\n')
-np.savetxt(output_folder+"var_vals_normal",dispersion_vals_normal,fmt="%s",delimiter=',',newline='\n')
+np.savetxt(output_folder+"var_vals_normal",var_vals_normal,fmt="%s",delimiter=',',newline='\n')
 
 
 
 
-print("avg value of pmax patient is : " + str(mean_pmax_patient))
+#print("avg value of pmax patient is : " + str(mean_pmax_patient))
 print("avg_value of pmax normal is : " + str(mean_pmax_normal))
 
-print("avg value of pdisp patient is : " + str(mean_pdisp_patient))
+#print("avg value of pdisp patient is : " + str(mean_pdisp_patient))
 print("avg_value of pdisp normal is : " + str(mean_pdisp_normal))
 
-print("avg value of pvar patient is : " + str(mean_pvar_patient))
+#print("avg value of pvar patient is : " + str(mean_pvar_patient))
 print("avg_value of pvar normal is : " + str(mean_pvar_normal))
     
     #####

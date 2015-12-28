@@ -54,8 +54,7 @@ import sklearn
 
 ##############################################################################
 #folder to save csv in 
-output_folder="/home/ubuntu/Documents/Thesis_work/results/19_oct_results/non_linear/sodp_analysis/square_filtered_features/"
-
+output_folder="/home/ubuntu/Documents/Thesis_work/results/ecg_analysis/fixed_pwave_code/"
 
 # #folder to read feartures from
 # output_folder_afpdb="/home/ubuntu/Documents/Thesis_work/results/19_oct_results/non_linear/sodp_analysis/afpdb_apdb_nsrdb/afpdb/"
@@ -121,7 +120,7 @@ for val in csv_indexes:
     f_name=inv_global_vocab[val]
     csv_header.append(f_name)
 
-rw.combine_n_write_df_to_csv(all_feature_matrix, csv_header, y_all,["labels"],output_folder, "SQ_filtered_Xtrain.csv")
+rw.combine_n_write_df_to_csv(all_feature_matrix, csv_header, y_all,["labels"],output_folder, "pwave_testing.csv")
 #rw.combine_n_write_df_to_csv(train_index,["training_index"],train_recs,["training_recs"],output_folder,"t_rec_train_index_n_recname.csv")
 exit();
 

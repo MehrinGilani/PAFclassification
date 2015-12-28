@@ -72,6 +72,8 @@ output_folder="/home/ubuntu/Documents/Thesis_work/testing/rf_sklearn/"
 # np.savetxt(output_folder+"all_features_list.txt",all_features_list,fmt="%s",delimiter=',',newline='\n')
 
 feature_matrix = np.loadtxt('/home/ubuntu/Documents/Thesis_work/testing/rf_sklearn/SQ_filtered_Xtrain_pwave_29fs_no_label.csv', delimiter=",")
+print ("type of feature matrix is : " + str(type(feature_matrix)))
+
 #feature_matrix=feature_matrix[:,0:1]
 
 y=[]
@@ -112,133 +114,307 @@ y_arr=np.asarray(y)
 
 #feature_matrix=normalized_matrix;
 #feature_matrix=all_feature_matrix
-
+method='new feature'
 ###############################################################################
+if method == 'new feature':
+    print(" new feature")
 # Classification and ROC analysis
  
-# Run classifier with cross-validation and plot ROC curves
- 
-folds=len(y_arr)
-#folds=10
-cv = StratifiedKFold(y, n_folds=folds)
-classifier_1 = RandomForestClassifier(n_estimators=100)
-classifier_2 = RandomForestClassifier(n_estimators=100)
+    # Run classifier with cross-validation and plot ROC curves
+     
+    folds=len(y_arr)
+    
+    cv = StratifiedKFold(y, n_folds=folds)
+    classifier_1 = RandomForestClassifier(n_estimators=100)
+    classifier_2 = RandomForestClassifier(n_estimators=100)
+    
 ###################################################
 ### implementing 2 classifiers
-y_test_report=[];
-y_predicted_report=[]
-  
-  
-all_indexes=[]
-index_list=[]
-for i, (train, test) in enumerate(cv):
-  
-    pwave_pred_normal_index=[]
-    pwave_pred_patient_index=[]
-     
-    rr_pred_normal_index=[]
-    rr_pred_patient_index=[]
-    y_predicted=[-1]*(len(y_arr[test]))
-     
-    
-    y_predicted_pwave=[]
-    y_predicted_rr=[]
-     
-    feature_pwave=feature_matrix[:,0:1]
-    feature_rr=feature_matrix[:,2:-1]
-    
-    local_index=[]
-    local_patient_index=[]
-    local_normal_index=[]
-    
-    classifier_1.fit(feature_rr[train], y_arr[train]) 
-    y_predicted_rr=(classifier_1.predict(feature_rr[test]))
-    #y_predicted_rr=[1]*(len(y_arr[test]))
-    
-    
-    
-    for i in range(len(y_predicted_rr)):   
-    #for predicted_class in y_predicted_pwave:
-        if y_predicted_rr[i] == 0:
-            local_index.append(i)
-            rr_pred_normal_index.append(test[i])
-        elif y_predicted_rr[i]== 1:
-            rr_pred_patient_index.append(test[i])
-            local_patient_index.append(i)
-            
-            
-     
-        
-    classifier_2.fit(feature_pwave[train],y_arr[train])
-    
-    pwave_y_test=feature_pwave[rr_pred_patient_index]
-    #print ("rr_y_test is:  " + str(rr_y_test))
-    y_predicted_pwave=classifier_2.predict(pwave_y_test)
-     
-    
-    for i in range(len(y_predicted_pwave)):
-        if y_predicted_pwave[i] == 0:
-            pwave_pred_normal_index.append(local_patient_index[i])
-        elif y_predicted_pwave[i] ==1:
-            pwave_pred_patient_index.append(local_patient_index[i])
-             
-    
-   
-    
-#     for val in rr_pred_normal_index:
-#         if y_predicted_pwave[val] == y_predicted_rr[val]:
-#             y_predicted[val]=0;
-#         else:
-#             y_predicted[val]=1
-    for val in local_index:
-        if y_predicted[val] != -1:
-            print("error in local _index loop")
-            #exit()
-        
-        y_predicted[val]=0;
-    
-    for val in pwave_pred_normal_index:
-        if y_predicted[val] != -1:
-            print("error in pwave_pred_normal loop")
-            #exit()
-        y_predicted[val]=0;
-   
-    for val in pwave_pred_patient_index:
-        if y_predicted[val] != -1:
-            print('val is : ' + str(val))
-            print('y predicted[val] is : ' + str(y_predicted[val]))
-            print("error in pwave_pred_patient loop")
-            #exit()
-        #if y_predicted_pwave[val] != y_predicted_rr[val]:
-        y_predicted[val]=1;
-        
-    
-    #y_predicted=y_predicted_rr
-    
-    
-    ##make predicted array
-    #print y_predicted
-     
-    y_predicted_report.extend(y_predicted)
-    y_test_report.extend(y_arr[test])
-     
-     
- 
- 
-print y_test_report
-print y_predicted_report
-####### Compute confusion matrix #######
-cm = metrics.confusion_matrix(y_test_report, y_predicted_report)
-np.set_printoptions(precision=2)
-print('Confusion matrix for: rf_sklearn')
-print(cm)
- 
-   
-print ("overall accuracy score of the classifier is")
-print metrics.accuracy_score(y_test_report, y_predicted_report)
-target_names = ['class 0', 'class 1']
-print(classification_report(np.array(y_test_report), np.array(y_predicted_report), target_names=target_names));
 
+    y_test_report=[];
+    y_predicted_report=[]
+      
+      
+    all_indexes=[]
+    index_list=[]
+    for i, (train, test) in enumerate(cv):
+        proba0_train=[]
+        proba1_train=[]
+        proba0_test=[]
+        proba1_test=[]
+        pwave_pred_normal_index=[]
+        pwave_pred_patient_index=[]
+         
+        rr_pred_normal_index=[]
+        rr_pred_patient_index=[]
+        y_predicted=[-1]*(len(y_arr[test]))
+         
+        
+        y_predicted_pwave=[]
+        y_predicted_rr=[]
+         
+        feature_pwave=feature_matrix[:,0:2]
+        feature_rr=feature_matrix[:,2:-1]
+        
+        local_index=[]
+        local_patient_index=[]
+        local_normal_index=[]
+        
+        classifier_1.fit(feature_rr[train], y_arr[train]) 
+        l_feature_pred_prob_train=(classifier_1.predict_proba(feature_rr[train]))
+        #print("l_feature_pred_prob_train is : " + str(feature_pred_prob))
+        
+        ## make 2 new features for train using predic proba ####
+        for i in range(len(l_feature_pred_prob_train)):
+            proba0_train.append(l_feature_pred_prob_train[i,0])
+            proba1_train.append(l_feature_pred_prob_train[i,1])
+        
+        #print (" proba1_train is: "  + str(proba1_train))
+       
+        y_predicted_rr=(classifier_1.predict(feature_rr[test]))
+        l_feature_pred_prob_test=(classifier_1.predict_proba(feature_rr[test]))
+        ## make 2 new features for test using predic proba ####
+        for i in range(len(l_feature_pred_prob_test)):
+            proba0_test.append(l_feature_pred_prob_test[i,0])
+            proba1_test.append(l_feature_pred_prob_test[i,1])
+        
+#         for i in range(len(y_predicted_rr)):
+#             if y_predicted_rr[i] != y_arr[test[i]]:
+#                 print ("predicted y is: " + str(y_predicted_rr[i]) + " predicted probability is: " + str(feature_pred_prob_train[i]))
+            
+            #y_predicted_rr=[1]*(len(y_arr[test]))
+        
+        
+        
+        for i in range(len(y_predicted_rr)):   
+        #for predicted_class in y_predicted_pwave:
+            if y_predicted_rr[i] == 0:
+                local_index.append(i)
+                rr_pred_normal_index.append(test[i])
+            elif y_predicted_rr[i]== 1:
+                rr_pred_patient_index.append(test[i])
+                local_patient_index.append(i)
+                
+  
+             
+        
+        ## make new feature train matrix here: 
+        added_feature_matrix_train=np.zeros((len(train),((shape(feature_pwave)[1])+2)),dtype=float)
+        added_feature_matrix_train[:,:-2]=feature_pwave[train]
+        added_feature_matrix_train[:,-2]=proba0_train
+        added_feature_matrix_train[:,-1]=proba1_train
+        #print ("shape of added feature matrix is: " + str(shape(added_feature_matrix_train)))
+        
+        ## make new feature test matrix here: 
+#         added_feature_matrix_test=np.zeros((len(test),((shape(feature_pwave)[1])+2)),dtype=float)
+#         added_feature_matrix_test[:,:-2]=feature_pwave[test]
+#         added_feature_matrix_test[:,-2]=proba0_test
+#         added_feature_matrix_test[:,-1]=proba1_test
+#         print ("shape of added feature matrix is: " + str(shape(added_feature_matrix_test)))
+        
+        classifier_2.fit(added_feature_matrix_train,y_arr[train])
+        
+        pwave_y_test=added_feature_matrix_train[rr_pred_patient_index]
+        #print ("rr_y_test is:  " + str(rr_y_test))
+        y_predicted_pwave=classifier_2.predict(pwave_y_test)
+         
+        
+        for i in range(len(y_predicted_pwave)):
+            if y_predicted_pwave[i] == 0:
+                pwave_pred_normal_index.append(local_patient_index[i])
+            elif y_predicted_pwave[i] ==1:
+                pwave_pred_patient_index.append(local_patient_index[i])
+                 
+        
+       
+        
+    #     for val in rr_pred_normal_index:
+    #         if y_predicted_pwave[val] == y_predicted_rr[val]:
+    #             y_predicted[val]=0;
+    #         else:
+    #             y_predicted[val]=1
+        for val in local_index:
+            if y_predicted[val] != -1:
+                print("error in local _index loop")
+                #exit()
+            
+            y_predicted[val]=0;
+        
+        for val in pwave_pred_normal_index:
+            if y_predicted[val] != -1:
+                print("error in pwave_pred_normal loop")
+                #exit()
+            y_predicted[val]=0;
+       
+        for val in pwave_pred_patient_index:
+            if y_predicted[val] != -1:
+                print('val is : ' + str(val))
+                print('y predicted[val] is : ' + str(y_predicted[val]))
+                print("error in pwave_pred_patient loop")
+                #exit()
+            #if y_predicted_pwave[val] != y_predicted_rr[val]:
+            y_predicted[val]=1;
+            
+        
+        #y_predicted=y_predicted_rr
+        
+        
+        ##make predicted array
+        #print y_predicted
+         
+        y_predicted_report.extend(y_predicted)
+        y_test_report.extend(y_arr[test])
+         
+     
+     
+    print y_test_report
+    print y_predicted_report
+    ####### Compute confusion matrix #######
+    cm = metrics.confusion_matrix(y_test_report, y_predicted_report)
+    np.set_printoptions(precision=2)
+    print('Confusion matrix for: rf_sklearn')
+    print(cm)
+     
+       
+    print ("overall accuracy score of the classifier is")
+    print metrics.accuracy_score(y_test_report, y_predicted_report)
+    target_names = ['class 0', 'class 1']
+    print(classification_report(np.array(y_test_report), np.array(y_predicted_report), target_names=target_names));
+###############################################################################
+elif method == ' no new feature':
+    print("in no new feature")
+# Classification and ROC analysis
+ 
+    # Run classifier with cross-validation and plot ROC curves
+     
+    folds=len(y_arr)
+    
+    cv = StratifiedKFold(y, n_folds=folds)
+    classifier_1 = RandomForestClassifier(n_estimators=100)
+    classifier_2 = RandomForestClassifier(n_estimators=100)
+   
+###################################################
+
+### implementing 2 classifiers
+
+    y_test_report=[];
+    y_predicted_report=[]
+      
+      
+    all_indexes=[]
+    index_list=[]
+    for i, (train, test) in enumerate(cv):
+      
+        pwave_pred_normal_index=[]
+        pwave_pred_patient_index=[]
+         
+        rr_pred_normal_index=[]
+        rr_pred_patient_index=[]
+        y_predicted=[-1]*(len(y_arr[test]))
+         
+        
+        y_predicted_pwave=[]
+        y_predicted_rr=[]
+         
+        feature_pwave=feature_matrix[:,0:1]
+        feature_rr=feature_matrix[:,2:-1]
+        
+        local_index=[]
+        local_patient_index=[]
+        local_normal_index=[]
+        
+        classifier_1.fit(feature_rr[train], y_arr[train]) 
+    
+        y_predicted_rr=(classifier_1.predict(feature_rr[test]))
+        
+        
+       
+            
+            #y_predicted_rr=[1]*(len(y_arr[test]))
+        
+        
+        
+        for i in range(len(y_predicted_rr)):   
+        #for predicted_class in y_predicted_pwave:
+            if y_predicted_rr[i] == 0:
+                local_index.append(i)
+                rr_pred_normal_index.append(test[i])
+            elif y_predicted_rr[i]== 1:
+                rr_pred_patient_index.append(test[i])
+                local_patient_index.append(i)
+                
+                
+         
+            
+        classifier_2.fit(feature_pwave[train],y_arr[train])
+        
+        pwave_y_test=feature_pwave[rr_pred_patient_index]
+        #print ("rr_y_test is:  " + str(rr_y_test))
+        y_predicted_pwave=classifier_2.predict(pwave_y_test)
+         
+        
+        for i in range(len(y_predicted_pwave)):
+            if y_predicted_pwave[i] == 0:
+                pwave_pred_normal_index.append(local_patient_index[i])
+            elif y_predicted_pwave[i] ==1:
+                pwave_pred_patient_index.append(local_patient_index[i])
+                 
+        
+       
+        
+    #     for val in rr_pred_normal_index:
+    #         if y_predicted_pwave[val] == y_predicted_rr[val]:
+    #             y_predicted[val]=0;
+    #         else:
+    #             y_predicted[val]=1
+        for val in local_index:
+            if y_predicted[val] != -1:
+                print("error in local _index loop")
+                #exit()
+            
+            y_predicted[val]=0;
+        
+        for val in pwave_pred_normal_index:
+            if y_predicted[val] != -1:
+                print("error in pwave_pred_normal loop")
+                #exit()
+            y_predicted[val]=0;
+       
+        for val in pwave_pred_patient_index:
+            if y_predicted[val] != -1:
+                print('val is : ' + str(val))
+                print('y predicted[val] is : ' + str(y_predicted[val]))
+                print("error in pwave_pred_patient loop")
+                #exit()
+            #if y_predicted_pwave[val] != y_predicted_rr[val]:
+            y_predicted[val]=1;
+            
+        
+        y_predicted=y_predicted_rr
+        
+        
+        ##make predicted array
+        #print y_predicted
+         
+        y_predicted_report.extend(y_predicted)
+        y_test_report.extend(y_arr[test])
+         
+         
+     
+     
+    print y_test_report
+    print y_predicted_report
+    ####### Compute confusion matrix #######
+    cm = metrics.confusion_matrix(y_test_report, y_predicted_report)
+    np.set_printoptions(precision=2)
+    print('Confusion matrix for: rf_sklearn')
+    print(cm)
+     
+       
+    print ("overall accuracy score of the classifier is")
+    print metrics.accuracy_score(y_test_report, y_predicted_report)
+    target_names = ['class 0', 'class 1']
+    print(classification_report(np.array(y_test_report), np.array(y_predicted_report), target_names=target_names));
 ####################################################
 exit()
 
