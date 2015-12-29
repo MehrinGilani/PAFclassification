@@ -60,6 +60,9 @@ def generate_labels(db_name,rec_array):
     elif db_name =="afdb":
         for val in rec_array:
             label_array.append("patient")
+    elif db_name =="aftdb":
+        for val in rec_array:
+            label_array.append("patient")
     
     print("done writing labels")
     

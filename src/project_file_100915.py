@@ -57,7 +57,7 @@ import classification_functions as cl
 
 
 
-output_folder="/home/ubuntu/Documents/Thesis_work/results/19_oct_results/non_linear/sodp_analysis/afpdb_test/"
+output_folder="/home/ubuntu/Documents/Thesis_work/results/1_min_features/afpdb_normal/"
 
 db_name="afpdb";
 initial_rec_array=[];
@@ -78,10 +78,15 @@ print("annotators for this database are: " + str(annotator_array) + " we are cho
 initial_rec_array=ws.dload_rec_names(db_name);
  
  
-wo_continuation_recs=ws.rmv_continuation_rec(initial_rec_array)
-#rec_name_array=ws.rmv_test_rec(wo_continuation_recs)
-rec_name_array=ws.rmv_even_rec(wo_continuation_recs)
- 
+#wo_continuation_recs=ws.rmv_continuation_rec(initial_rec_array)
+
+
+
+rec_name_array_temp=ws.rmv_test_rec(initial_rec_array)
+
+rec_name_array=ws.rmv_p_rec(rec_name_array_temp)
+#rec_name_array=ws.rmv_even_rec(wo_continuation_recs)
+#rec_name_array=initial_rec_array
  
 print str(rec_name_array)
 
@@ -175,7 +180,7 @@ for record in rec_name_array:
     
     ## time for which you want to read record ##
     start_time=0;
-    end_time=30; #time in mins
+    end_time=1; #time in mins
     
     ##### Extract RR intervals here #######
     
@@ -307,9 +312,10 @@ for record in rec_name_array:
     
     
     ##### Calculating 30min features for HRV using toolkit VALUES #################
-    total_min=30;
+    
     start_time="00:00:00"
-    end_time="00:30:00"
+    #end_time="00:30:00"
+    end_time="00:01:00"
     hrv_feature_list_30min="'SDANN|AVNN|rMSSD|pNN50|TOT PWR|VLF PWR|ULF PWR|LF PWR|HF PWR|LF/HF'"
     list_of_list_of30min_features=pr.get_short_term_hrv(hrv_feature_list_30min,rec_name,annotation,start_time,end_time,output_folder)
     
@@ -339,7 +345,7 @@ for record in rec_name_array:
     ###### Calculating non-linear features for RR_sec VALUES #################
     ctm_array=[];
     dist_array=[];
-    total_min=30;
+    #total_min=30;
     x_val_sodp,y_val_sodp,ctm_array,ctm_feature_name,dist_array,dist_feature_name=nlm.calc_sodp_measures(rec_name,RR_sec, radius_array);
         
     ##add value to feature array and name to global vocab
@@ -353,7 +359,8 @@ for record in rec_name_array:
     
     #     ##### Calculating 30 min quadrant points ratio features  #################
     start_time=0
-    end_time=30;
+    #end_time=30
+    end_time=1;
     feature_list_30min,feature_name=nlm.calc_30min_sodp_measures(rec_name,annotation, start_time,end_time, x_val_sodp,y_val_sodp)
     
     ##add value to feature array and name to global vocab
@@ -372,12 +379,12 @@ for record in rec_name_array:
 #     plt.figure()
 #     plt.plot(radius_array,dist_array)
 #     plt.title("dist_array for " +str(rec_name))
-    
-    ##### Calculating std of 5min features in all 6 intervals in 30min sodp features #################
-    list_of_listall_features_6_intervals,std_dev_all_features,feature_name_overall=nlm.calc_std_5min_sodp_measures(rec_name,annotation,30, radius_array)
-    for val,name in zip(std_dev_all_features,feature_name_overall):
-        feature_rec.append(val)
-        global_vocab,index_of_features=cl.fill_global_vocab(name, index_of_features, global_vocab)
+      #total_min=30;
+#     ##### Calculating std of 5min features in all 6 intervals in 30min sodp features #################
+#     list_of_listall_features_6_intervals,std_dev_all_features,feature_name_overall=nlm.calc_std_5min_sodp_measures(rec_name,annotation,total_min, radius_array)
+#     for val,name in zip(std_dev_all_features,feature_name_overall):
+#         feature_rec.append(val)
+#         global_vocab,index_of_features=cl.fill_global_vocab(name, index_of_features, global_vocab)
 ############################################################################################################################################################
 
 

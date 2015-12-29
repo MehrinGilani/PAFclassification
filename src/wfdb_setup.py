@@ -48,7 +48,14 @@ def dload_rec_names(database_name):
 
     
     return rec_name_array
-
+def rmv_p_rec(initial_array):
+    # this fucntion removes records with t from the initial_records_array
+    without_p_array=[];
+    for val in initial_array:
+        if "p" not in val:
+            without_p_array.append(val)
+    print("done removing p records")
+    return without_p_array
 def rmv_test_rec(initial_array):
     # this fucntion removes records with t from the initial_records_array
     without_t_array=[];
