@@ -109,6 +109,7 @@ def extract_pwave(output_folder,record,rec_name,annotation,start_time,end_time):
     #print("nsamp:"+str(nsamp)+" freq:"+str(freq));
     
     rdann_file=output_folder+"ecgpu_output.txt"
+    s1_rdann_file=output_folder+"s1_ecgpu_output.txt"
     output_ann="output_annotator"
     
     
@@ -116,9 +117,9 @@ def extract_pwave(output_folder,record,rec_name,annotation,start_time,end_time):
     #change directory to output_folder
     os.chdir(output_folder) 
     
-   
+    signal_0="0";
     os.system("rm -f "+rdann_file)
-    cmd_create_ann="ecgpuwave -r "+rec_name +" "+"-a"+" "+output_ann+ " -f "+start_time+" -t "+ end_time +" -i "+annotation
+    cmd_create_ann="ecgpuwave -r "+rec_name +" "+"-a"+" "+output_ann+ " -f "+start_time+" -t "+ end_time +" -i "+annotation+" -s "+signal_0
     print(cmd_create_ann)
     os.system(cmd_create_ann)
     
@@ -128,7 +129,7 @@ def extract_pwave(output_folder,record,rec_name,annotation,start_time,end_time):
     print (cmd_disp_ann)
     os.system(cmd_disp_ann +">" +rdann_file)
 
-    l_p_wave_times=[] # this will contain p wave values for 1 rec and will be emptied everytime
+    s0_l_p_wave_times=[] # this will contain p wave values for 1 rec and will be emptied everytime
     
     ## code for p wave time calculation goes here ####
     f=open(rdann_file,'r')
@@ -142,10 +143,39 @@ def extract_pwave(output_folder,record,rec_name,annotation,start_time,end_time):
             end_sample_num=float(temp[1])
             #print("end_sample_num is: " +str(end_sample_num))
             p_duration_ms=(end_sample_num-start_sample_num) *(1000/freq);
-            l_p_wave_times.append(p_duration_ms)
+            s0_l_p_wave_times.append(p_duration_ms)
+            #print ("pwave duration from signal 0 is : " + str(p_duration_ms))
+    ##### extract p wave times for second signal
+    signal_1="1";
+    os.system("rm -f "+s1_rdann_file)
+    cmd_create_ann="ecgpuwave -r "+rec_name +" "+"-a"+" "+output_ann+ " -f "+start_time+" -t "+ end_time +" -i "+annotation+" -s "+signal_1
+    print(cmd_create_ann)
+    os.system(cmd_create_ann)
      
-
-    return l_p_wave_times
+    #use rdann to ouput annotations as a text file
+    cmd_disp_ann="rdann -r "+rec_name+" -a output_annot"
+    #push output text to a file 
+    print (cmd_disp_ann)
+    os.system(cmd_disp_ann +">" +s1_rdann_file)
+ 
+    s1_l_p_wave_times=[] # this will contain p wave values for 1 rec and will be emptied everytime
+     
+    ## code for p wave time calculation goes here ####
+    f=open(s1_rdann_file,'r')
+    for line in f:
+         
+        temp=line.split()
+        if (temp[2] == '(') and (temp[-1] =='0'):
+            start_sample_num=float(temp[1])
+            #print ("start sample num is : "+ str(start_sample_num))
+        elif (temp[2] == ')') and (temp[-1] =='0'):
+            end_sample_num=float(temp[1])
+            #print("end_sample_num is: " +str(end_sample_num))
+            p_duration_ms=(end_sample_num-start_sample_num) *(1000/freq);
+            #print ("pwave duration from signal 1 is : " + str(p_duration_ms))
+            s1_l_p_wave_times.append(p_duration_ms)
+    return s0_l_p_wave_times,s1_l_p_wave_times
+    #return s0_l_p_wave_times
 
 def separate_p_n_pwave(record,db_name,p_wave_times,pwave_time_patient,pwave_time_normal):
     if ('p' in record) or (db_name == 'afdb'):
@@ -157,20 +187,45 @@ def separate_p_n_pwave(record,db_name,p_wave_times,pwave_time_patient,pwave_time
     
     return pwave_time_patient,pwave_time_normal
 
-def calc_pwave_max(p_wave_times):
+def calc_pwave_max(pwave_times_0,pwave_times_1):
     #this func will take p wave array for 1 patient and calculate and return the max value in pwave  
-    pwave_max=np.max(p_wave_times)
-    return pwave_max
+    if (len(pwave_times_0) != 0):
+        pwave_max_0=np.max(pwave_times_0)
+    else:
+        pwave_max_0=-1
+    if (len(pwave_times_1) !=0):
+        pwave_max_1=np.max(pwave_times_1)
+    else:
+        pwave_max_1=-1
     
-def calc_pwave_var(p_wave_times):  
-    variance=np.var(p_wave_times)
-    return variance
+    return pwave_max_0,pwave_max_1
+
+def calc_pwave_var(pwave_times_0,pwave_times_1):
+    if (len(pwave_times_0) != 0):
+        variance_0=np.var(pwave_times_0)
+    else: 
+        variance_0 = -1
+    if (len(pwave_times_1) !=0):
+        variance_1=np.var(pwave_times_1)
+    else:
+        variance_1=-1
+    return variance_0,variance_1
     
-def calc_pwave_disp(p_wave_times):
-    max_val=np.max(p_wave_times)
-    min_val=np.min(p_wave_times)
-    disp_val=max_val-min_val
-    return disp_val
+def calc_pwave_disp(pwave_times_0,pwave_times_1):
+    if (len(pwave_times_0) != 0):
+        max_val_0=np.max(pwave_times_0)
+        min_val_0=np.min(pwave_times_0)
+        disp_val_0=max_val_0-min_val_0
+    else:
+        disp_val_0=-1
+    if (len(pwave_times_1) !=0):
+        max_val_1=np.max(pwave_times_1)
+        min_val_1=np.min(pwave_times_1)
+        disp_val_1=max_val_1-min_val_1
+    else: 
+        disp_val_1=-1
+    
+    return disp_val_0,disp_val_1
 
 
     

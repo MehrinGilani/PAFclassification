@@ -97,6 +97,7 @@ for record in rec_name_array:
     p_wave_times=pecg.extract_pwave(output_folder,record,rec_name,annotation,start_time,end_time)
     #pwave_time_patient,pwave_time_normal=pecg.separate_p_n_pwave(record,db_name,p_wave_times,pwave_time_patient,pwave_time_normal) #i dont thing we need this
     
+    ## this would not work for now
     pwave_max=pecg.calc_pwave_max(p_wave_times)
     feature_rec.append(pwave_max)
     global_vocab_ecg,index_of_features_ecg=cl.fill_global_vocab("pwave_max", index_of_features_ecg, global_vocab_ecg)
