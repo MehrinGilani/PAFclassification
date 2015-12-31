@@ -1,1 +1,1 @@
-qrs	unaudited beat annotations
+ecg	corrected beat annotations from an automated detector

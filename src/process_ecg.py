@@ -227,7 +227,22 @@ def calc_pwave_disp(pwave_times_0,pwave_times_1):
     
     return disp_val_0,disp_val_1
 
-
+def extract_trend_frm_pwave(pwave_times):
+    pwave_variability=[]
+    counter=0;
+    pwave_segment=[]
+    for val in pwave_times:
+        pwave_segment.append(val)
+        counter+=1;
+        if counter == 10:
+            #compute pwave variability value
+            percentile_90=np.percentile(pwave_segment,90)
+            percentile_10=np.percentile(pwave_segment,10)
+            diff=percentile_90-percentile_10
+            pwave_variability.append(diff)
+            counter=0
+            pwave_segment[:]=[]
+    return pwave_variability
     
     
     

@@ -34,11 +34,13 @@ import non_linear_measures as nlm;
 import classification_functions as cl
 
 import process_ecg as pecg
+from process_ecg import extract_trend_frm_pwave
 
 
-output_folder="/home/ubuntu/Documents/Thesis_work/testing/pwave_test/pwave_code_debug/challenge_db_pwave/raw_pwave_analysis/"
 
-db_name="afpdb";
+output_folder="/home/ubuntu/Documents/Thesis_work/testing/pwave_test/pwave_trend_analysis/fantasia/"
+
+db_name="fantasia";
 initial_rec_array=[];
 rec_name_array=[];
 annotator_array=[];
@@ -52,6 +54,8 @@ for ann_name in annotator_array:
     if ann_name == "qrs":
         annotation=ann_name;
     if ann_name == "atr":
+        annotation=ann_name;
+    if ann_name=='ecg':
         annotation=ann_name;
 print("annotators for this database are: " + str(annotator_array) + " we are choosing " + str(annotation))
 
@@ -96,9 +100,22 @@ for record in rec_name_array:
     #p_wave_times=[] # this will contain p wave values for 1 rec and will be emptied everytime
     p_wave_times_0,p_wave_times_1=pecg.extract_pwave(output_folder,record,rec_name,annotation,start_time,end_time)
     
+    trend_s0=pecg.extract_trend_frm_pwave(p_wave_times_0)
+    trend_s1=pecg.extract_trend_frm_pwave(p_wave_times_1)
+    ###plot pwave points  and save fig ####
+    fig_pwave,plot_pwave=graphs.plotScatter(rec_name,range(len(trend_s0)),trend_s0, "serial num", " pwave duration variability (ms) ", "s0 p wave duration variability", 'g',xlim_lo=0, xlim_hi=0, ylim_lo=0, ylim_hi=0,axline=0)
+    #fig_pwave,plot_pwave=graphs.plot_simple(rec_name,range(len(p_wave_times_0)),p_wave_times_0, "serial num", " pwave duration (ms) ", "s0 p wave duration ", 'g',xlim_lo=0, xlim_hi=0, ylim_lo=0, ylim_hi=0)
+    fig_pwave.savefig(output_folder+"trend_s0_pwave_duration_"+record+".png")
+    
+    ###plot pwave points  and save fig ####
+    fig_pwave_1,plot_pwave_1=graphs.plotScatter(rec_name,range(len(trend_s1)),trend_s1, "serial num", " pwave duration variability (ms) ", "s1 p wave duration variability ", 'g',xlim_lo=0, xlim_hi=0, ylim_lo=0, ylim_hi=0,axline=0)
+    #fig_pwave_1,plot_pwave_1=graphs.plot_simple(rec_name,range(len(p_wave_times_1)),p_wave_times_1, "serial num", " pwave duration (ms) ", "s1 p wave duration ", 'g',xlim_lo=0, xlim_hi=0, ylim_lo=0, ylim_hi=0)
+    fig_pwave_1.savefig(output_folder+"trend__s1_pwave_duration_"+record+".png")
+
+
     #pwave_time_patient,pwave_time_normal=pecg.separate_p_n_pwave(record,db_name,p_wave_times,pwave_time_patient,pwave_time_normal) #i dont thing we need this
-    feature_rec.append(p_wave_times_0)
-    global_vocab_ecg,index_of_features_ecg=cl.fill_global_vocab("pwave_time_0", index_of_features_ecg, global_vocab_ecg)
+#     feature_rec.append(p_wave_times_0)
+#     global_vocab_ecg,index_of_features_ecg=cl.fill_global_vocab("pwave_time_0", index_of_features_ecg, global_vocab_ecg)
     
 #     ## this would not work for now
 #     pwave_max_0,pwave_max_1=pecg.calc_pwave_max(p_wave_times_0,p_wave_times_1)
