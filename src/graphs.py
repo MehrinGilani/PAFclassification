@@ -49,22 +49,24 @@ def plotScatter(rec_name,x_array,y_array, xlabel, ylabel, title, color_code,xlim
     ### plot RR intervals array ###
     fig=plt.figure()
     plot = plt.scatter(x_array,y_array,color=color_code);
-    #plt.legend()
-    
-    
     plt.xlabel(xlabel);
     plt.ylabel(ylabel);
+    
     #plt.xlabel("beats")
     #plt.ylabel(" RR interval");
-    if ylim_hi is not 0:
+    if ylim_hi != 0:
         plt.ylim(ylim_lo,ylim_hi);
-    if xlim_hi is not 0:
+        
+    if xlim_hi != 0:
         plt.xlim(xlim_lo,xlim_hi);
 
     plt.title(title+" for %s" % rec_name);
-    if axline is not 0:
+    if axline != 0:
         plt.axhline(color = 'gray', zorder=-1)
         plt.axvline(color = 'gray', zorder=-1)
+    
+    
+    #plt.legend()
     return fig, plot;
 
 

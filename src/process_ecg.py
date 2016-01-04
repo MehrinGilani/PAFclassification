@@ -23,6 +23,7 @@ from matplotlib.ticker import FuncFormatter
 
 import wfdb_setup as ws;
 
+
 #variables and arrays 
 
 def gettime(sample_num, freq, init_time):
@@ -100,7 +101,100 @@ def get_ecg_signal(rec_name,annotation,start_time,end_time):
     
     
     return(physig0,physig1,sig_time)    
+
+def extract_wave_times(output_folder,record,rec_name,annotation,start_time,end_time,signal_num):   
+    ##The num field of each WFON and WFOFF annotation designates the type of waveform with which it is associated: 0 for a P wave, 1 for a QRS complex, or 2 for a T wave. 
     
+
+#     ## doing wave num encoding here:
+#     if wave_name == 'p':
+#         wave_num = '0'
+#     elif wave_name == 'r':
+#         wave_num = '1'
+#     elif wave_name =='t':
+#         wave_num = '2'
+    
+    ## time for which you want to read record ##
+    nsamp, freq, annot, init_time,sdata=ws.setupWfdb(rec_name, annotation)
+    
+    
+    rdann_file=output_folder+"ecgpu_output.txt"
+    output_ann="output_annotator"
+    
+    os.chdir(output_folder) 
+    
+    signal=signal_num;
+    os.system("rm -f "+rdann_file)
+    cmd_create_ann="ecgpuwave -r "+rec_name +" "+"-a"+" "+output_ann+ " -f "+start_time+" -t "+ end_time +" -i "+annotation+" -s "+signal
+    print(cmd_create_ann)
+    os.system(cmd_create_ann)
+    
+    #use rdann to ouput annotations as a text file
+    cmd_disp_ann="rdann -r "+rec_name+" -a output_annot"
+    #push output text to a file 
+    print (cmd_disp_ann)
+    os.system(cmd_disp_ann +">" +rdann_file)
+    
+    ## features we want to extract:
+    # p_dur=p_off-p_on
+    # p_ini=p_p_peak-p_on
+    # p_ter = p_off - p_peak
+    # p_asy=p_ter/p_ini
+    
+    #pr_on
+    #pr_peak
+    #r_off
+   
+    l_wave_dur_time=[]  # this will contain p/t wave values for 1 rec and will be emptied everytime
+    l_wave_ini_time=[]
+    l_wave_ter_time=[]
+    l_wave_asy_time=[]
+    l_pr_on_time=[]
+    l_pr_peak_time=[]
+    l_pr_off_time=[]
+    l_pp_on_time=[]
+    
+    ## code for p wave time calculation goes here ####
+    f=open(rdann_file,'r')
+    p_true=0
+    for line in f:
+        
+        temp=line.split()
+        if (temp[2] == '(') and (temp[-1] =='0'):
+            start_sample_num=float(temp[1])
+            #print ("start sample num is : "+ str(start_sample_num))
+        elif (temp[2] == 'p') and (temp[-1] =='0'):
+            peak_sample_num=float(temp[1])
+            p_true=1;
+        elif (temp[2] == ')') and (temp[-1] =='0'):
+            end_sample_num=float(temp[1])
+            #print("end_sample_num is: " +str(end_sample_num))
+            wave_duration_ms=(end_sample_num-start_sample_num) *(1000/freq);
+            wave_ini_ms=(peak_sample_num-start_sample_num)*(1000/freq)
+            wave_ter_ms=(end_sample_num-peak_sample_num)*(1000/freq)
+            wave_asy_ms=wave_ter_ms/wave_ini_ms
+            l_wave_dur_time.append(wave_duration_ms)
+            l_wave_ini_time.append(wave_ini_ms)
+            l_wave_ter_time.append(wave_ter_ms)
+            l_wave_asy_time.append(wave_asy_ms)
+        if (temp[2] == 'N') and (temp[-1] =='0') and (p_true== 1): # this is looking for r peakvand making sure that p wave was calculated previously
+            r_peak_sample=float(temp[1])
+            pr_on_ms=(r_peak_sample -start_sample_num)*(1000/freq)
+            pr_peak_ms=(r_peak_sample-peak_sample_num)*(1000/freq)
+            pr_off_ms=(r_peak_sample-end_sample_num)*(1000/freq)
+            p_true=0;
+            l_pr_on_time.append(pr_on_ms)
+            l_pr_peak_time.append(pr_peak_ms)
+            l_pr_off_time.append(pr_off_ms)
+                    
+    for i in range(len(l_wave_dur_time)-1):
+        pp_on_ms=l_wave_dur_time[i+1]- l_wave_dur_time[i]
+        l_pp_on_time.append(pp_on_ms)
+    #print ("pwave duration from signal 0 is : " + str(p_duration_ms))
+    ##### extract p wave times for second signal 
+    all_time_features=[l_wave_dur_time,l_wave_ini_time,l_wave_ter_time,l_wave_asy_time,l_pr_on_time,l_pr_peak_time,l_pr_off_time]
+    return all_time_features
+
 def extract_pwave(output_folder,record,rec_name,annotation,start_time,end_time):
     ## time for which you want to read record ##
     nsamp, freq, annot, init_time,sdata=ws.setupWfdb(rec_name, annotation)
@@ -227,22 +321,22 @@ def calc_pwave_disp(pwave_times_0,pwave_times_1):
     
     return disp_val_0,disp_val_1
 
-def extract_trend_frm_pwave(pwave_times):
-    pwave_variability=[]
+def extract_trend_frm_list(wave_times):
+    wave_variability=[]
     counter=0;
-    pwave_segment=[]
-    for val in pwave_times:
-        pwave_segment.append(val)
+    wave_segment=[]
+    for val in wave_times:
+        wave_segment.append(val)
         counter+=1;
         if counter == 10:
             #compute pwave variability value
-            percentile_90=np.percentile(pwave_segment,90)
-            percentile_10=np.percentile(pwave_segment,10)
+            percentile_90=np.percentile(wave_segment,90)
+            percentile_10=np.percentile(wave_segment,10)
             diff=percentile_90-percentile_10
-            pwave_variability.append(diff)
+            wave_variability.append(diff)
             counter=0
-            pwave_segment[:]=[]
-    return pwave_variability
+            wave_segment[:]=[]
+    return wave_variability
     
     
     

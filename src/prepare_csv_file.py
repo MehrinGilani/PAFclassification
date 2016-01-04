@@ -55,7 +55,13 @@ import sklearn
 ##############################################################################
 #folder to save csv in 
 #output_folder="/home/ubuntu/Documents/Thesis_work/results/ecg_analysis/fixed_pwave_code/"
-output_folder="/home/ubuntu/Documents/Thesis_work/testing/pwave_test/pwave_code_debug/challenge_db_pwave/raw_pwave_analysis/"
+#output_folder="/home/ubuntu/Documents/Thesis_work/testing/pwave_test/pwave_all_features/"
+
+
+output_folder="/home/ubuntu/Documents/Thesis_work/results/pwave_sig0_sig1/rr_features_5min_trend/"
+#output_folder="/home/ubuntu/Documents/Thesis_work/results/19_oct_results/non_linear/sodp_analysis/5min_trend_features/"
+
+
 # #folder to read feartures from
 #output_folder_aftdb="/home/ubuntu/Documents/Thesis_work/results/1_min_features/aftdb/"
 #output_folder_afpdb_patient="/home/ubuntu/Documents/Thesis_work/testing/pwave_test/pwave_code_debug/afdb_pwave/"
@@ -128,7 +134,7 @@ for val in csv_indexes:
     f_name=inv_global_vocab[val]
     csv_header.append(f_name)
 
-rw.combine_n_write_df_to_csv(all_feature_matrix, csv_header, y_all,["labels"],output_folder, "raw_pwave_afpdb.csv")
+rw.combine_n_write_df_to_csv(all_feature_matrix, csv_header, y_all,["labels"],output_folder, "rr_5min_trend_touse_w_pwave.csv")
 #rw.combine_n_write_df_to_csv(train_index,["training_index"],train_recs,["training_recs"],output_folder,"t_rec_train_index_n_recname.csv")
 exit();
 
