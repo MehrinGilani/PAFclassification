@@ -8,6 +8,7 @@ from _wfdb import calopen, aduphys;
 from wfdb import WFDB_Siginfo
 from matplotlib.lines import lineStyles
 from _wfdb import strtim
+import data_cleaning as dc;
 import os
 
 def dload_rec_names(database_name):
@@ -38,7 +39,7 @@ def dload_annotator_names(database_name):
         
     print("annotators for this database are: " + str(annotator_array) + " we are choosing " + str(annotator_array[0]))
     return annotator_array;
-
+output_folder="/home/ubuntu/Documents/Thesis_work/results/thesis_images/chapter_4/"
 
 #variables and arrays 
 iteration=[];
@@ -54,7 +55,8 @@ db_name="afpdb";
 
 annotation=dload_annotator_names(db_name)[0];
 #rec_name=dload_rec_names(db_name)[0];
-rec_name = "afpdb/n04c"
+record="n08"
+rec_name = "afpdb/"+record
 
 #Find the number of signals in record
 nsig = wfdb.isigopen(rec_name, None, 0);
@@ -113,7 +115,7 @@ def gettime(sample_num, freq, init_time):
 #sample interval
 
 #required length of signal in seconds
-siglength_sec=10;
+siglength_sec=1;
 print type(freq);
 loop_iteration=int(math.floor(siglength_sec*freq));
 
@@ -122,7 +124,6 @@ print("loop iteration = " +str(loop_iteration));
 
 # loop runs for loop_iteration times to extract signal samples
 num_value=loop_iteration;
-
 for i in range(0,num_value):
     if wfdb.getvec(sdata.cast()) < 0:
         print "ERROR: getvec() < 0";
@@ -131,15 +132,39 @@ for i in range(0,num_value):
         #signal values in adu units:
         sig0.append(sdata[0]);
         sig1.append(sdata[1]);
-        
+         
         sig_time.append(gettime(i, freq, init_time));
         #print("time for sample " + str(i) + "is: " + str(sig_time[i]));
         #convert adu units to physical units and save in physig0 and 1 (later generalise it for n number of signals)
         physig0.append(aduphys(0,sig0[i]));
         physig1.append(aduphys(1,sig1[i]));
-       
+        
         #append iteration number as value in 
         iteration.append(i);
+# for i in range(0,num_value):
+#     if wfdb.getvec(sdata.cast()) < 0:
+#         print "ERROR: getvec() < 0";
+#         exit();
+#     else:
+#         #signal values in adu units:
+#         sig0.append(sdata[0]);
+#         sig1.append(sdata[1]);
+#         sig_time.append(gettime(i, freq, init_time));
+# 
+# start_sec=4*60
+# end_sec=5*60
+# start_val=int(math.floor(start_sec*freq));
+# end_val=int(math.floor(end_sec*freq));
+# #loop_iteration=int(math.floor(siglength_sec*freq));
+# for i in range(start_val,end_val):
+# 
+#         #print("time for sample " + str(i) + "is: " + str(sig_time[i]));
+#         #convert adu units to physical units and save in physig0 and 1 (later generalise it for n number of signals)
+#         physig0.append(aduphys(0,sig0[i]));
+#         physig1.append(aduphys(1,sig1[i]));
+#         wfdb.timstr(-annot.time),"(" + str(annot.time)+ ")",wfdb.annstr(annot.anntyp), annot.subtyp,annot.chan, annot.num
+#         #append iteration number as value in 
+#         iteration.append(i);
         
 ##########        READ ANNOTATION ##################
 if wfdb.annopen(rec_name, a, 1) < 0: 
@@ -149,11 +174,12 @@ if wfdb.annopen(rec_name, a, 1) < 0:
 #getann reads next annotation and returns 0 when successful
 while wfdb.getann(0,annot) ==0:
     if annot.time>num_value:
+    #if annot.time>=start_val and annot.time<=end_val: 
         print("annot.time>number of samples extracted");
         break;
     #  annot.time is time of the annotation, in samples from the beginning of the record.
     print wfdb.timstr(-annot.time),"(" + str(annot.time)+ ")",wfdb.annstr(annot.anntyp), annot.subtyp,annot.chan, annot.num
-    print ("signal value at this annotation is : " + str(physig0[annot.time])+" "+ str(sig_time[annot.time]));
+   # print ("signal value at this annotation is : " + str(physig0[annot.time])+" "+ str(sig_time[annot.time]));
     
     
 #else:
@@ -199,27 +225,37 @@ for i in f:
 
 
 #y values physical units
-#plt.plot(sig_time,physig0,linestyle="-");    
-#plt.plot(sig_time,physig1,linestyle="-");
-
-
-#axis labels and legends
-plt.xlabel("time elapsed from start of record");
-plt.ylabel(" ecg (mV) ");
-plt.title(" %s" % rec_name);
+signal_num="P, QRS and T Waves"
+#signal_num="Signal 1"
+physig1=dc.detrend_data(physig1)
+plt.plot(sig_time,physig1,linestyle="-",color='b');   
+plt.xlabel("Time elapsed from start of record (sec)");
+plt.ylabel(" Amplitude (mV) ");
+plt.ylim(-1,1.5)
+plt.title(signal_num); 
+#plt.title(signal_num+" for " + rec_name); 
+# plt.figure()
+# plt.plot(sig_time,physig1,linestyle="-");
+# 
+# 
+# #axis labels and legends
+# plt.xlabel("Time elapsed from start of record (sec)");
+# plt.ylabel(" Amplitude (mV) ");
+# plt.title(" %s" % rec_name);
 
 ax = fig.gca();
-ax.set_xticks(np.arange(0,(num_value/freq),0.2));
+#ax.set_xticks(np.arange(0,(num_value/freq),0.2));
 #ax.set_yticks(np.arange(sig_min,sig_max,0.5));
 
 #keep grid
 ax.grid(True);
-ax.set_xticklabels([])
-
-plt.figure()
-plt.plot(fft_values)
-plt.xlabel("? confirm if this is frequency");
-plt.ylabel(" fft ");
-plt.title(" %s" % rec_name);
+#ax.set_xticklabels([])
+plt.savefig(output_folder+"pqrst_ecg_"+record+".pdf",format='pdf')
+    
+# plt.figure()
+# plt.plot(fft_values)
+# plt.xlabel("? confirm if this is frequency");
+# plt.ylabel(" fft ");
+# plt.title(" %s" % rec_name);
 
 plt.show();

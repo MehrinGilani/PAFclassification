@@ -47,7 +47,7 @@ import process_ecg as pecg
 
 
 
-output_folder="/home/ubuntu/Documents/Thesis_work/results/pwave_sig0_sig1/"
+output_folder="/home/ubuntu/Documents/Thesis_work/results/pwave_sig0_sig1/pwave_rr_patient_up/pwave_patient_up/"
 
 db_name="afpdb";
 initial_rec_array=[];
@@ -55,17 +55,20 @@ rec_name_array=[];
 annotator_array=[];
 wo_continuation_recs=[]
  
-recs_to_remove=['n24','n27','n28'];
+#recs_to_remove=['n24','n27','n28'];
  
 annotator_array=ws.dload_annotator_names(db_name);
 for ann_name in annotator_array:
     print ann_name
-    if ann_name == "qrs":
-        annotation=ann_name;
     if ann_name == "atr":
         annotation=ann_name;
-    if ann_name=='ecg':
+    elif ann_name == "qrs":
         annotation=ann_name;
+    elif ann_name=='ecg':
+        annotation=ann_name;
+
+# if db_name == 'afdb':
+#     annotation='atr'
 print("annotators for this database are: " + str(annotator_array) + " we are choosing " + str(annotation))
 
 
@@ -114,7 +117,7 @@ for record in rec_name_array:
         
         #print (all_time_features)
         #exit()
-        all_feature_names=['wave_dur_time','wave_ini_time','wave_ter_time','wave_asy_time','pr_on_time','pr_peak_time','pr_off_time','pp_on_time']
+        all_feature_names=['wave_dur_time','wave_ini_time','wave_ter_time','wave_asy_time','pr_on_time','pr_peak_time','pr_off_time']
         stat_feature_names=[sig_num+'_'+'size_val',sig_num+'_'+'min',sig_num+'_'+'max',sig_num+'_'+'mean_val',sig_num+'_'+'var_val',sig_num+'_'+'skewness_val',sig_num+'_'+'kurtosis_val']
         #all_feature_names_s1=['s1_wave_dur_time','s1_wave_ini_time','s1_wave_ter_time','s1_wave_asy_time','s1_pr_on_time','s1_pr_peak_time','s1_pr_off_time','s1_pp_on_time']
         index_num=0;
@@ -138,11 +141,6 @@ for record in rec_name_array:
         
             index_num=index_num+1;
     
-  
-
-    
-    
-
     
     all_features.append(feature_rec)
 print(' dict is: ' + str((global_vocab_ecg)))

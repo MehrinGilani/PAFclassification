@@ -29,6 +29,7 @@ from scipy.misc import imread,imshow,imsave
 from scipy.linalg import norm
 from scipy import sum, average
 import process_rr as pr;
+import graphs
 
 def calc_sodp_values(rr_array):
     #take rr array and return x val and y val
@@ -829,6 +830,16 @@ def calc_std_5min_sodp_measures(rec_name,annotation, total_min, radius_array):
         x_val_sodp,y_val_sodp,ctm_array,ctm_feature_name,distance_array,dist_feature_name=calc_sodp_measures(rec_name,RR_sec, radius_array);
         ## calculate the number of poitns in each quadrant
         num_points_on_graph=len(x_val_sodp)
+        
+       
+        ####plot sodp and save fig ####
+        record_name="n43"
+        output_folder="/home/ubuntu/Documents/Thesis_work/results/thesis_images/chapter_5/"
+        fig_sodp,plot_sodp=graphs.plotScatter(record_name,x_val_sodp,y_val_sodp, "x[n+1]-x[n]", " x[n+2]-x[n+1] ", "SODP plot for 5min segment "+str(num_5min_interval) , 'b',xlim_lo=-1, xlim_hi=1, ylim_lo=-1, ylim_hi=1,axline=1)
+        fig_sodp.savefig(output_folder+"sodp_plot_"+record_name+"_"+str(num_5min_interval)+".pdf",format='pdf')
+  
+        
+        
         
         for x_val,y_val in zip(x_val_sodp,y_val_sodp):
             if x_val <-1 or x_val>1 or y_val<-1 or y_val>1:

@@ -58,7 +58,8 @@ import sklearn
 #output_folder="/home/ubuntu/Documents/Thesis_work/testing/pwave_test/pwave_all_features/"
 
 
-output_folder="/home/ubuntu/Documents/Thesis_work/results/pwave_sig0_sig1/rr_features_5min_trend/"
+
+output_folder="/home/ubuntu/Documents/Thesis_work/results/pwave_sig0_sig1/pwave_rr_patient_up/rr_patient_up/"
 #output_folder="/home/ubuntu/Documents/Thesis_work/results/19_oct_results/non_linear/sodp_analysis/5min_trend_features/"
 
 
@@ -134,7 +135,7 @@ for val in csv_indexes:
     f_name=inv_global_vocab[val]
     csv_header.append(f_name)
 
-rw.combine_n_write_df_to_csv(all_feature_matrix, csv_header, y_all,["labels"],output_folder, "rr_5min_trend_touse_w_pwave.csv")
+rw.combine_n_write_df_to_csv(all_feature_matrix, csv_header, y_all,["labels"],output_folder, "rr_patient_up.csv")
 #rw.combine_n_write_df_to_csv(train_index,["training_index"],train_recs,["training_recs"],output_folder,"t_rec_train_index_n_recname.csv")
 exit();
 

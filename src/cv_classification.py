@@ -49,7 +49,7 @@ import read_write as rw;
 import non_linear_measures as nlm;
 import classification_functions as cl
 import sklearn
-
+from sklearn.pipeline import Pipeline
 ##############################################################################
 
 output_folder="/home/ubuntu/Documents/Thesis_work/results/19_oct_results/non_linear/sodp_analysis/5min_trend_features/"
@@ -122,6 +122,8 @@ y_test_report=[];
 y_predicted_report=[]
 y_proba_report=[]
 
+#classifiers=[svm.SVC(kernel='linear', probability=True),RandomForestClassifier(n_estimators=100)]
+#clf_name=['svm','randomforest']
 for i, (train, test) in enumerate(cv):
     ## prepare and normalize test train matrices
     
@@ -132,6 +134,16 @@ for i, (train, test) in enumerate(cv):
     normalised_matrix_test=cl.normalise_mean_var(all_feature_matrix[test])
     
     y_predicted2=[]
+    
+    
+    #####
+    #for clf,name_clf in zip(classifiers
+    #create a pipeline
+    # wrapper_filter= somefilter 
+    # pipe_line = Pipeline([('wrapper', wrapper_selection), (name_clf, clf)])
+    # pipe_line.fit(normalized_matrix_train,y[train])
+    #pipe_line.score()
+    #####
     
     #select features using rfecv only on train data
     only_feature_selection_matrix,index_arr_onlyfs=cl.select_optimal_features(normalized_matrix_train,y[train],classifier)

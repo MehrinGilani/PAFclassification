@@ -34,6 +34,10 @@ from sklearn.svm import SVC
 import read_write as rw;
 
 
+
+
+
+
 def fill_global_vocab(feature_name,index_of_features,feature_dictionary):
     if feature_name not in feature_dictionary.keys():
         feature_dictionary[feature_name]=index_of_features;
@@ -68,7 +72,31 @@ def generate_labels(db_name,rec_array):
     
     return label_array
 
-        
+def generate_labels_bool(db_name,rec_array):
+    label_array=[]
+    if db_name == "afpdb":
+        for val in rec_array:
+            if "n" in val:
+                label_array.append(0)
+            elif "p" in val:
+                label_array.append(1)
+            elif "t" in val:
+                label_array.append("?")
+    
+    elif db_name =="nsrdb":
+        for val in rec_array:
+            label_array.append(0)
+    
+    elif db_name =="afdb":
+        for val in rec_array:
+            label_array.append(1)
+    elif db_name =="aftdb":
+        for val in rec_array:
+            label_array.append(1)
+    
+    print("done writing bool labels")
+    
+    return label_array        
         
 def covert_array_to_matrix(array):
     converted_matrix=np.matrix(array)

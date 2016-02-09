@@ -36,7 +36,8 @@ import read_write as rw;
 import non_linear_measures as nlm;
 import classification_functions as cl
 
-
+from matplotlib.backends.backend_pdf import PdfPages
+pp = PdfPages('multipage.pdf')
 #for the given db_name
 ##download record names
 ##download annotator names
@@ -58,7 +59,8 @@ import classification_functions as cl
 
 
 
-output_folder="/home/ubuntu/Documents/Thesis_work/results/pwave_sig0_sig1/pwave_rr_patient_up/rr_patient_up/"
+output_folder="/home/ubuntu/Documents/Thesis_work/results/thesis_images/chapter_5/"
+
 
 db_name="afpdb";
 initial_rec_array=[];
@@ -66,7 +68,7 @@ rec_name_array=[];
 annotator_array=[];
 wo_continuation_recs=[]
  
-#recs_to_remove=['n24','n27','n28'];
+recs_to_remove=['n24','n27','n28'];
  
 annotator_array=ws.dload_annotator_names(db_name);
 for ann_name in annotator_array:
@@ -79,11 +81,11 @@ print("annotators for this database are: " + str(annotator_array) + " we are cho
 initial_rec_array=ws.dload_rec_names(db_name);
  
  
-wo_continuation_recs=ws.rmv_continuation_rec(initial_rec_array)
+#wo_continuation_recs=ws.rmv_continuation_rec(initial_rec_array)
 
 
 
-rec_name_array_temp=ws.rmv_test_rec(wo_continuation_recs)
+rec_name_array_temp=ws.rmv_test_rec(initial_rec_array)
 
 #rec_name_array=ws.rmv_p_rec(rec_name_array_temp)
 #rec_name_array=ws.rmv_even_rec(wo_continuation_recs)
@@ -92,59 +94,7 @@ rec_name_array=rec_name_array_temp
 print str(rec_name_array)
 
 #############################################################################
-#### list of features (per record) that we want to extract ######
-# global_mean
-# global_std_dev
-# nn50
-# pnn50
-# sdsd
-# window_1_std_dev
-# .
-# .
-# .
-# window_100_std_dev
-# std_dev_all_window
-# diff_rr_std_dev (might be similar to rmSSD)
-### start with time domain for now
-# freq domain for 5 mins of data
-# total_pwr_1
-# .
-# .
-# .
-# total_pwr_6
-# VLF_pwr_1
-# .
-# .
-# .
-# VLF_pwr_6
-# HF_pwr_1
-# .
-# .
-# .
-# HF_pwr_6
-# LF/HF ratio_1
-# .
-# .
-# .
-# LF/HF ratio_6
-# ctm_1
-# .
-# .
-# .
-# ctm_20
-# dist_1
-# .
-# .
-# .
-# dist_20
 
-#other features that can be added : 
-# poincare_sd1
-# poincare_sd2
-# poincare_ratio
-# ApEn
-# SampEn
-#### end of list of features (per record) that we want to extract ######
 #############################################################################
 
 
@@ -186,7 +136,8 @@ for record in rec_name_array:
     ##### Extract RR intervals here #######
     
     RR_sec_unclean=pr.get_RR_interval(rec_name,annotation,start_time,end_time)
-    
+    print RR_sec_unclean
+   
     ####DELETE THE FIRST RR_sec_unclean value#####
     del RR_sec_unclean[0];
     
@@ -202,10 +153,34 @@ for record in rec_name_array:
     RR_sec=dc.square_filt(RR_sec_unclean)
     #RR_sec=RR_sec_unclean
     ##### Extract delta RR intervals here #######
-    delta_RR_sec = pr.get_delta_rr(RR_sec);
     
-    ###### Calculating GOLBAL statistical features for RR_sec VALUES #################
+    #if "n" in record:
+        ####plot sodp and save fig ####
+        #fig_rr,plot_rr=graphs.plotScatter(rec_name,range(len(RR_sec)),RR_sec, "RR interval count", " RR interval (ms)", "Raw RR interval plot", 'b',xlim_lo=0, xlim_hi=80, ylim_lo=0.4, ylim_hi=1.0,axline=0)
+        #fig_rr.savefig(output_folder+"raw_rr_scatter_"+record+".pdf",format='pdf')
+    #if "p" in record:
+        ####plot sodp and save fig ####
+        #fig_rr,plot_rr=graphs.plotScatter(rec_name,range(len(RR_sec)),RR_sec, "RR interval count", " RR interval (ms)", "Raw RR interval plot", 'r',xlim_lo=0, xlim_hi=80, ylim_lo=0.4, ylim_hi=1.0,axline=0)
+        #fig_rr.savefig(output_folder+"raw_rr_scatter_"+record+".pdf",format='pdf')
+        
+    delta_RR_sec = pr.get_delta_rr(RR_sec);
+    total_min=30;
+    ##### Calculating std of 5min features in all 6 intervals in 30min sodp features #################
+    list_of_listall_features_6_intervals,std_dev_all_features,feature_name_overall=nlm.calc_std_5min_sodp_measures(rec_name,annotation,total_min, radius_array)
 
+
+    exit();
+
+
+#     ###### Calculating GOLBAL statistical features for RR_sec VALUES #################
+#     if "n" in record:
+#         ####plot sodp and save fig ####
+#         fig_std,plot_std_p=graphs.plot_simple(rec_name,range(len(std_dev_window_arr)), std_dev_window_arr, "Window number", "Standard Deviation", "SDW Series ", 'b',xlim_lo=0, xlim_hi=1, ylim_lo=0, ylim_hi=0.2)
+#         fig_std.savefig(output_folder+"std_dev_window_"+record+".pdf",format='pdf')
+#     if "p" in record:
+#         ####plot sodp and save fig ####
+#         fig_std,plot_std_p=graphs.plot_simple(rec_name,range(len(std_dev_window_arr)), std_dev_window_arr, "Window number", "Standard Deviation", "SDW Series ", 'r',xlim_lo=0, xlim_hi=1, ylim_lo=0, ylim_hi=0.2)
+#         fig_std.savefig(output_folder+"std_dev_window_"+record+".pdf",format='pdf')
     ###calculating AVG/mean of RR intervals ###
     mean_global=np.mean(RR_sec)*1000;
     mean_global_arr.append(mean_global) #do we need this?
@@ -257,8 +232,14 @@ for record in rec_name_array:
 ###plot window std_dev and save fig ####
 #     fig_std_p,plot_std_p=graphs.plot_simple(rec_name,range(len(std_dev_window_arr)), std_dev_window_arr, "window std dev for  window size:  %s" % window_size, "std_dev", "window std dev", "r", 0, 0,-0.1, 0.5)
 #     fig_std_p.savefig(output_folder+"std_dev_window_"+record+".png")
-             
-             
+    if "n" in record:
+        ####plot sodp and save fig ####
+        fig_std,plot_std_p=graphs.plot_simple(rec_name,range(len(std_dev_window_arr)), std_dev_window_arr, "Window number", "Standard Deviation", "SDW Series ", 'b',xlim_lo=0, xlim_hi=1, ylim_lo=0, ylim_hi=0.2)
+        fig_std.savefig(output_folder+"std_dev_window_"+record+".pdf",format='pdf')
+    if "p" in record:
+        ####plot sodp and save fig ####
+        fig_std,plot_std_p=graphs.plot_simple(rec_name,range(len(std_dev_window_arr)), std_dev_window_arr, "Window number", "Standard Deviation", "SDW Series ", 'r',xlim_lo=0, xlim_hi=1, ylim_lo=0, ylim_hi=0.2)
+        fig_std.savefig(output_folder+"std_dev_window_"+record+".pdf",format='pdf')
 
     ### calculating variation in the std_dev_window_arr and save as feature
     var_std_dev_window_arr=np.std(std_dev_window_arr);
@@ -296,7 +277,7 @@ for record in rec_name_array:
             
             if val > threshold_4:
                 #number of values greater than 0.15
-                count_threshold_4=count_threshold_4+1;
+                count_threshold_3=count_threshold_4+1;
     
     feature_rec.append(count_threshold_4);
     global_vocab,index_of_features=cl.fill_global_vocab("count_threshold_"+str(threshold_4), index_of_features, global_vocab)
@@ -314,11 +295,11 @@ for record in rec_name_array:
     
     ##### Calculating 30min features for HRV using toolkit VALUES #################
     
-    start_time="00:00:00"
-    end_time="00:30:00"
+    start_time_string="00:00:00"
+    end_time_string="00:01:00"
     #end_time="00:01:00"
     hrv_feature_list_30min="'SDANN|AVNN|rMSSD|pNN50|TOT PWR|VLF PWR|ULF PWR|LF PWR|HF PWR|LF/HF'"
-    list_of_list_of30min_features=pr.get_short_term_hrv(hrv_feature_list_30min,rec_name,annotation,start_time,end_time,output_folder)
+    list_of_list_of30min_features=pr.get_short_term_hrv(hrv_feature_list_30min,rec_name,annotation,start_time_string,end_time_string,output_folder)
     
     for list in list_of_list_of30min_features:
         for feature_tuple in list:
@@ -358,9 +339,27 @@ for record in rec_name_array:
         feature_rec.append(val)
         global_vocab,index_of_features=cl.fill_global_vocab(name, index_of_features, global_vocab)
     
+    
+#     if "n" in record:
+#         ####plot sodp and save fig ####
+#         fig_sodp,plot_sodp=graphs.plotScatter(rec_name,x_val_sodp,y_val_sodp, "x[n+1]-x[n]", " x[n+2]-x[n+1] ", "SODP plot ", 'b',xlim_lo=-1, xlim_hi=1, ylim_lo=-1, ylim_hi=1,axline=1)
+#         fig_sodp.savefig(output_folder+"sodp_plot_"+record+".pdf",format='pdf')
+#     if "p" in record:
+#         ####plot sodp and save fig ####
+#         fig_sodp,plot_sodp=graphs.plotScatter(rec_name,x_val_sodp,y_val_sodp, "x[n+1]-x[n]", " x[n+2]-x[n+1] ", "SODP plot ", 'r',xlim_lo=-1, xlim_hi=1, ylim_lo=-1, ylim_hi=1,axline=1)
+#         fig_sodp.savefig(output_folder+"sodp_plot_"+record+".pdf",format='pdf')
+    
+    ############## showing 16 quadrants
+    if "p" in record:
+        ####plot sodp and save fig ####
+        fig_sodp,plot_sodp=graphs.plotScatter(rec_name,x_val_sodp,y_val_sodp, "x[n+1]-x[n]", " x[n+2]-x[n+1] ", "16 Quadrants in the SODP plot ", 'r',xlim_lo=-1, xlim_hi=1, ylim_lo=-1, ylim_hi=1,axline=1)
+        fig_sodp.savefig(output_folder+"quad_sodp_plot_"+record+".pdf",format='pdf')
+    
+    
+    
+    ###################################3
     #     ##### Calculating 30 min quadrant points ratio features  #################
-    start_time=0
-    end_time=30
+  
     #end_time=1;
     feature_list_30min,feature_name=nlm.calc_30min_sodp_measures(rec_name,annotation, start_time,end_time, x_val_sodp,y_val_sodp)
     
@@ -422,8 +421,10 @@ for record in rec_name_array:
 #          
 #     elif "p" in record:   
 #     ####plot sodp and save fig ####
-#         fig_sodp,plot_sodp=graphs.plotScatter(rec_name,x_val_sodp,y_val_sodp, "x[n+1]-x[n]", " x[n+2]-x[n+1] ", "SODP plot ", 'r',xlim_lo=-1, xlim_hi=1, ylim_lo=-1, ylim_hi=1,axline=1)
-#         fig_sodp.savefig(output_folder+"sodp_plot_"+record+".png")
+#     fig_sodp,plot_sodp=graphs.plotScatter(rec_name,x_val_sodp,y_val_sodp, "x[n+1]-x[n]", " x[n+2]-x[n+1] ", "SODP plot ", 'b',xlim_lo=-1, xlim_hi=1, ylim_lo=-1, ylim_hi=1,axline=1)
+#     fig_sodp.savefig(output_folder+"sodp_plot_"+record+".png")
+#     plt.show()
+
 #     ######### PLOTTING windowed standard dev array ################
 #     
 # #     if "n" in record:
@@ -503,6 +504,6 @@ rw.write_value(all_features,output_folder,"all_features_readable.txt",'w')
 rw.write_features_to_file(all_features,output_folder,"all_features_pickle.txt") 
 rw.write_features_to_file(global_vocab,output_folder,"global_vocab_pickle.txt")
 rw.write_features_to_file(rec_name_array, output_folder, "rec_name_array_pickle.txt")
-#plt.show()
+plt.show()
 
 

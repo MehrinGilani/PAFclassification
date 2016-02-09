@@ -45,7 +45,7 @@ def plotHist(rec_name, RR_sec, n_bins,xlabel, ylabel, title, xlim_lo=0, xlim_hi=
     plt.title(title+" for %s" % rec_name);
     return fig, plot;
     
-def plotScatter(rec_name,x_array,y_array, xlabel, ylabel, title, color_code,xlim_lo=0, xlim_hi=0, ylim_lo=0, ylim_hi=0,axline=0):
+def plotScatter(rec_name,x_array,y_array, xlabel, ylabel, title, color_code,xlim_lo=-0xfffff, xlim_hi=-0xfffff, ylim_lo=-0xfffff, ylim_hi=-0xfffff,axline=0):
     ### plot RR intervals array ###
     fig=plt.figure()
     plot = plt.scatter(x_array,y_array,color=color_code);
@@ -54,10 +54,10 @@ def plotScatter(rec_name,x_array,y_array, xlabel, ylabel, title, color_code,xlim
     
     #plt.xlabel("beats")
     #plt.ylabel(" RR interval");
-    if ylim_hi != 0:
+    if (ylim_hi != 0) or (ylim_lo!= 0):
         plt.ylim(ylim_lo,ylim_hi);
         
-    if xlim_hi != 0:
+    if (xlim_hi != 0) or (xlim_lo !=0):
         plt.xlim(xlim_lo,xlim_hi);
 
     plt.title(title+" for %s" % rec_name);
@@ -65,12 +65,13 @@ def plotScatter(rec_name,x_array,y_array, xlabel, ylabel, title, color_code,xlim
         plt.axhline(color = 'gray', zorder=-1)
         plt.axvline(color = 'gray', zorder=-1)
     
-    
+    ax = fig.gca();
+    #ax.grid(True);
     #plt.legend()
     return fig, plot;
 
 
-def plot_simple(rec_name,x_array,y_array, xlabel, ylabel, title, color_code,xlim_lo=0, xlim_hi=0, ylim_lo=0, ylim_hi=0):
+def plot_simple(rec_name,x_array,y_array, xlabel, ylabel, title, color_code,xlim_lo=-0xfffff, xlim_hi=-0xfffff, ylim_lo=-0xfffff, ylim_hi=-0xfffff):
     fig=plt.figure()
     plot = plt.plot(x_array,y_array,color=color_code);
     #plt.legend()
@@ -79,9 +80,9 @@ def plot_simple(rec_name,x_array,y_array, xlabel, ylabel, title, color_code,xlim
     plt.ylabel(ylabel);
     #plt.xlabel("beats")
     #plt.ylabel(" RR interval");
-    if ylim_hi is not 0:
+    if (ylim_hi != 0) or (ylim_lo!= 0):
         plt.ylim(ylim_lo,ylim_hi);
-    if xlim_hi is not 0:
+    if (xlim_hi != 0) or (xlim_lo !=0):
         plt.xlim(xlim_lo,xlim_hi);
 
     plt.title(title+" for %s" % rec_name);
